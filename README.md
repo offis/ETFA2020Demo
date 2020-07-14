@@ -1,3 +1,10 @@
+This repository contains guides and source files to recreate an example project that applies an online update as described in the paper
+
+Duc Do Tran, Kim Grüttner, Frank Oppenheimer, Wolfgang Nebel: ***Timing Contracts and Monitors for Safety Relevant Controller Design in IEC 61499***  in proceedings of *IEEE 25th International Conference on Emerging Technologies and Factory Automation* (**ETFA 2020**), 08-11 September 2020, Vienna, Austria.
+
+# Abstract:
+The IEC 61499 standard supports the design and deployment of distributed industrial control systems. It provides modularity through a hierarchical and event driven function block model and its deployment on distributed compute nodes. Even though IEC 61499 tools provide model based testing of applications before and after deployment, a systematic specification of timing requirements and its monitoring at design time is not well support. For safety relevant control applications the monitoring of execution time requirements at run-time would also serve an important safety measure. For this reason, we propose the application of assume/guarantee contracts on the ports of a function block. A hierarchical application of these contracts can be used to specify timing properties along causal event chains in IEC 61499 function bock models. Besides contract based speciﬁcation and design time consistency checks we propose a new function block type, called Timing Contract Function Block (TCFB). It allows monitoring of a timing contract at design and run-time, when this TCFB gets deployed on the target hardware. We evaluate our proposed methodology and the application of TCFBs for monitoring of timed causality chains on a simple pick and place control system that is modeled in the open-source framework 4diac
+
 # ETFA2020 Demo
 
 To explain the proposed contract methodology, we present a simple example for the control system of a pick & place robot (PnP) in the production line that is modeled in [4diac](https://www.eclipse.org/4diac/index.php), an open source IEC 61499 framework.
