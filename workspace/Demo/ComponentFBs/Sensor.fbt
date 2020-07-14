@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Template for an empty basic function block" Name="Sensor">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2019-03-19" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="Active" Type="Event">
+        <With Var="Direct"/>
+        <With Var="LimPos"/>
+      </Event>
+      <Event Comment="" Name="Request" Type="Event">
+        <With Var="Direct"/>
+        <With Var="LimPos"/>
+        <With Var="Position"/>
+      </Event>
+      <Event Comment="" Name="Reset" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="Ready" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+      <Event Comment="" Name="Response" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" Name="Direct" Type="BOOL"/>
+      <VarDeclaration Comment="" InitialValue="180" Name="LimPos" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Position" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" InitialValue="FALSE" Name="OUT" Type="BOOL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="trigger" Type="BOOL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="0" Name="i" Type="USINT"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="change" Type="BOOL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="300.0" y="200.0"/>
+      <ECState Comment="" Name="State" x="3400.0" y="1100.0">
+        <ECAction Algorithm="ON_State" Output="Response"/>
+      </ECState>
+      <ECState Comment="" Name="State_2" x="3200.0" y="200.0">
+        <ECAction Algorithm="ALG"/>
+      </ECState>
+      <ECState Comment="" Name="INIT" x="1800.0" y="100.0">
+        <ECAction Algorithm="InitState" Output="Ready"/>
+      </ECState>
+      <ECState Comment="" Name="Wait4Req" x="1600.0" y="1300.0"/>
+      <ECTransition Comment="" Condition="[trigger=FALSE]" Destination="Wait4Req" Source="State_2" x="2700.0" y="980.0"/>
+      <ECTransition Comment="" Condition="[trigger=TRUE]" Destination="State" Source="State_2" x="3366.666666666667" y="840.0"/>
+      <ECTransition Comment="" Condition="Active" Destination="INIT" Source="START" x="920.0" y="213.33333333333334"/>
+      <ECTransition Comment="" Condition="Request" Destination="State_2" Source="Wait4Req" x="1960.0" y="466.6666666666667"/>
+      <ECTransition Comment="" Condition="1" Destination="Wait4Req" Source="State" x="2560.0" y="1366.6666666666667"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="Wait4Req" x="1106.6666666666667" y="840.0"/>
+      <ECTransition Comment="" Condition="1" Destination="Wait4Req" Source="INIT" x="1653.3333333333335" y="560.0"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="ON_State">
+      <ST Text="OUT := TRUE;&#13;&#10;trigger := FALSE;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="ALG">
+      <ST Text="IF (Direct = FALSE) THEN //Run to LS2&#13;&#10;&#9;IF (Position &gt;= LimPos) THEN&#13;&#10;&#9;&#9;IF (change = FALSE) THEN&#13;&#10;&#9;&#9;&#9;change := TRUE;&#13;&#10;&#9;&#9;&#9;trigger := TRUE;&#13;&#10;&#9;&#9;END_IF;&#13;&#10;&#9;ELSE&#13;&#10;&#9;&#9;IF (change = TRUE) THEN&#13;&#10;&#9;&#9;&#9;change := FALSE;&#13;&#10;&#9;&#9;&#9;OUT := FALSE;&#13;&#10;&#9;&#9;END_IF;&#13;&#10;&#9;&#9;trigger := FALSE;&#13;&#10;&#9;END_IF;&#13;&#10;ELSE&#13;&#10;&#9;IF (Position &lt;= LimPos) THEN&#13;&#10;&#9;&#9;IF (change = FALSE) THEN&#13;&#10;&#9;&#9;&#9;change := TRUE;&#13;&#10;&#9;&#9;&#9;trigger := TRUE;&#13;&#10;&#9;&#9;END_IF;&#13;&#10;&#9;ELSE&#13;&#10;&#9;&#9;IF (change = TRUE) THEN&#13;&#10;&#9;&#9;&#9;change := FALSE;&#13;&#10;&#9;&#9;&#9;OUT := FALSE;&#13;&#10;&#9;&#9;END_IF;&#13;&#10;&#9;&#9;trigger := FALSE;&#13;&#10;&#9;END_IF;&#13;&#10;END_IF;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="InitState">
+      <ST Text="/*IF (Direct = TRUE) THEN&#13;&#10;&#9;OUT := FALSE;&#13;&#10;ELSE&#13;&#10;&#9;OUT :=TRUE;&#13;&#10;END_IF;*/&#13;&#10;OUT := FALSE;&#13;&#10;trigger := FALSE;&#13;&#10;change := FALSE;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>

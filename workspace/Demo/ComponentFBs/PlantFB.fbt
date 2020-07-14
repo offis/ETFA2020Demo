@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Composite Function Block Type" Name="PlantFB">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2019-03-19" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="INIT" Type="Event"/>
+      <Event Comment="" Name="REQ" Type="Event">
+        <With Var="U"/>
+        <With Var="PWM"/>
+      </Event>
+      <Event Comment="" Name="Reset" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="INITO" Type="Event">
+        <With Var="Position"/>
+        <With Var="Speed"/>
+        <With Var="RPM"/>
+      </Event>
+      <Event Comment="Execution Confirmation" Name="CNF" Type="Event">
+        <With Var="Position"/>
+        <With Var="Speed"/>
+        <With Var="RPM"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" InitialValue="0" Name="InitPos" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="0.1" Name="GearRatio" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="0.35" Name="CxTime" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="0.18" Name="CyTime" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="0.09" Name="CgTime" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="24" Name="U" Type="REAL"/>
+      <VarDeclaration Comment="" Name="PWM" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" Name="RPM" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Speed" Type="REAL"/>
+      <VarDeclaration Comment="Output event qualifier" InitialValue="180" Name="Position" Type="REAL"/>
+    </OutputVars>
+    <Sockets>
+      <AdapterDeclaration Comment="AdapterType  " Name="RI" Type="RobotInterface" x="2266.666666666667" y="1866.6666666666667"/>
+    </Sockets>
+  </InterfaceList>
+  <FBNetwork>
+    <FB Comment="" Name="Converter" Type="F_MUL" x="3866.666666666667" y="933.3333333333334"/>
+    <FB Comment="" Name="Us" Type="Randn" x="2266.666666666667" y="666.6666666666667">
+      <Parameter Name="Mode" Value="0"/>
+      <Parameter Name="ErrorRate" Value="0.02"/>
+    </FB>
+    <FB Comment="" Name="CyTime" Type="Randn" x="8266.666666666668" y="3333.3333333333335">
+      <Parameter Name="Mode" Value="1"/>
+      <Parameter Name="ErrorRate" Value="0.02"/>
+    </FB>
+    <FB Comment="" Name="CgTime" Type="Randn" x="6266.666666666667" y="3333.3333333333335">
+      <Parameter Name="Mode" Value="1"/>
+      <Parameter Name="ErrorRate" Value="0.01"/>
+    </FB>
+    <FB Comment="" Name="Motor" Type="Motor" x="4800.0" y="-133.33333333333334">
+      <Parameter Name="R" Value="2"/>
+      <Parameter Name="L" Value="0.5"/>
+      <Parameter Name="Ke" Value="0.1"/>
+      <Parameter Name="Kt" Value="0.1"/>
+      <Parameter Name="B" Value="0.2"/>
+      <Parameter Name="J" Value="0.02"/>
+    </FB>
+    <FB Comment="" Name="Gearbox" Type="Gearbox" x="7866.666666666667" y="-133.33333333333334"/>
+    <FB Comment="" Name="CxTime" Type="Randn" x="4133.333333333334" y="3333.3333333333335">
+      <Parameter Name="Mode" Value="1"/>
+      <Parameter Name="ErrorRate" Value="0.05"/>
+    </FB>
+    <FB Comment="" Name="HorizontalCylinder" Type="Cylinder" x="5466.666666666667" y="1866.6666666666667"/>
+    <FB Comment="" Name="Gripper" Type="Cylinder" x="7466.666666666667" y="1733.3333333333335"/>
+    <FB Comment="" Name="VerticalCylinder" Type="Cylinder" x="9333.333333333334" y="1733.3333333333335"/>
+    <EventConnections>
+      <Connection Comment="" Destination="Us.Active" Source="INIT" dx1="1073.3333333333335"/>
+      <Connection Comment="" Destination="Us.Request" Source="REQ" dx1="920.0"/>
+      <Connection Comment="" Destination="Converter.REQ" Source="Us.Response" dx1="186.66666666666669"/>
+      <Connection Comment="" Destination="CyTime.Request" Source="RI.ReqCy" dx1="2260.0"/>
+      <Connection Comment="" Destination="CgTime.Request" Source="RI.ReqCg" dx1="2146.666666666667"/>
+      <Connection Comment="" Destination="Motor.Start" Source="RI.StartMotor" dx1="466.6666666666667"/>
+      <Connection Comment="" Destination="Motor.Request" Source="Converter.CNF" dx1="133.33333333333334"/>
+      <Connection Comment="" Destination="Motor.Stop" Source="RI.StopMotor" dx1="733.3333333333334"/>
+      <Connection Comment="" Destination="Motor.Reset" Source="Reset" dx1="2160.0"/>
+      <Connection Comment="" Destination="Gearbox.Start" Source="Motor.Ready"/>
+      <Connection Comment="" Destination="Gearbox.Stop" Source="Motor.StopCNF"/>
+      <Connection Comment="" Destination="Gearbox.Reset" Source="Reset" dx1="6540.0"/>
+      <Connection Comment="" Destination="CNF" Source="Gearbox.Response" dx1="1193.3333333333335"/>
+      <Connection Comment="" Destination="Gearbox.Request" Source="Motor.Response"/>
+      <Connection Comment="" Destination="CxTime.Active" Source="Gearbox.Ready" dx1="80.0" dx2="80.0" dy="1846.6666666666667"/>
+      <Connection Comment="" Destination="CxTime.Request" Source="RI.ReqCx" dx1="593.3333333333334"/>
+      <Connection Comment="" Destination="HorizontalCylinder.Active" Source="CxTime.Ready" dx1="120.0"/>
+      <Connection Comment="" Destination="HorizontalCylinder.REQ" Source="CxTime.Response" dx1="273.33333333333337"/>
+      <Connection Comment="" Destination="CyTime.Active" Source="HorizontalCylinder.Ready" dx1="866.6666666666667"/>
+      <Connection Comment="" Destination="RI.X1" Source="HorizontalCylinder.PosS1" dx1="80.0" dx2="80.0" dy="-366.6666666666667"/>
+      <Connection Comment="" Destination="RI.X2" Source="HorizontalCylinder.PosS2" dx1="80.0" dx2="80.0" dy="-446.6666666666667"/>
+      <Connection Comment="" Destination="Gripper.Active" Source="CyTime.Ready" dx1="80.0" dx2="80.0" dy="-1000.0"/>
+      <Connection Comment="" Destination="Gripper.REQ" Source="CgTime.Response" dx1="186.66666666666669"/>
+      <Connection Comment="" Destination="CgTime.Active" Source="Gripper.Ready" dx1="80.0" dx2="80.0" dy="1000.0"/>
+      <Connection Comment="" Destination="RI.Go" Source="Gripper.PosS1" dx1="80.0" dx2="80.0" dy="-300.0"/>
+      <Connection Comment="" Destination="RI.Gc" Source="Gripper.PosS2" dx1="80.0" dx2="80.0" dy="-380.0"/>
+      <Connection Comment="" Destination="VerticalCylinder.Active" Source="CgTime.Ready" dx1="1360.0"/>
+      <Connection Comment="" Destination="VerticalCylinder.REQ" Source="CyTime.Response" dx1="160.0"/>
+      <Connection Comment="" Destination="INITO" Source="VerticalCylinder.Ready" dx1="500.0"/>
+      <Connection Comment="" Destination="RI.Y1" Source="VerticalCylinder.PosS1" dx1="80.0" dx2="80.0" dy="-273.33333333333337"/>
+      <Connection Comment="" Destination="RI.Y2" Source="VerticalCylinder.PosS2" dx1="80.0" dx2="80.0" dy="-386.6666666666667"/>
+      <Connection Comment="" Destination="HorizontalCylinder.Reset" Source="Reset" dx1="2493.3333333333335"/>
+      <Connection Comment="" Destination="Gripper.Reset" Source="Reset" dx1="3493.3333333333335"/>
+      <Connection Comment="" Destination="VerticalCylinder.Reset" Source="Reset" dx1="2986.666666666667"/>
+      <Connection Comment="" Destination="Motor.Start" Source="Us.Ready" dx1="100.0"/>
+      <Connection Comment="" Destination="Us.Stop" Source="Reset" dx1="893.3333333333334"/>
+      <Connection Comment="" Destination="CxTime.Stop" Source="Reset" dx1="1893.3333333333335"/>
+      <Connection Comment="" Destination="CgTime.Stop" Source="Reset" dx1="3026.666666666667"/>
+      <Connection Comment="" Destination="CyTime.Stop" Source="Reset" dx1="6793.333333333334"/>
+    </EventConnections>
+    <DataConnections>
+      <Connection Comment="" Destination="Us.IN" Source="U" dx1="1006.6666666666667"/>
+      <Connection Comment="" Destination="Converter.IN1" Source="Us.OUT" dx1="186.66666666666669"/>
+      <Connection Comment="" Destination="CyTime.IN" Source="CyTime" dx1="6733.333333333334"/>
+      <Connection Comment="" Destination="CgTime.IN" Source="CgTime" dx1="5706.666666666667"/>
+      <Connection Comment="" Destination="Converter.IN2" Source="PWM" dx1="866.6666666666667"/>
+      <Connection Comment="" Destination="Motor.U_i" Source="Converter.OUT" dx1="253.33333333333334"/>
+      <Connection Comment="" Destination="Gearbox.InitPos" Source="InitPos" dx1="6273.333333333334"/>
+      <Connection Comment="" Destination="Gearbox.Ratio" Source="GearRatio" dx1="2953.3333333333335"/>
+      <Connection Comment="" Destination="Gearbox.SpeedIn" Source="Motor.Speed"/>
+      <Connection Comment="" Destination="Gearbox.LoadIn" Source="RI.LoadIn" dx1="3920.0"/>
+      <Connection Comment="" Destination="RPM" Source="Gearbox.RPM" dx1="1193.3333333333335"/>
+      <Connection Comment="" Destination="Speed" Source="Gearbox.Speed" dx1="1193.3333333333335"/>
+      <Connection Comment="" Destination="Position" Source="Gearbox.Position" dx1="1193.3333333333335"/>
+      <Connection Comment="" Destination="Motor.T_L" Source="Gearbox.Tl" dx1="493.33333333333337" dx2="80.0" dy="593.3333333333334"/>
+      <Connection Comment="" Destination="Gearbox.Direct" Source="Motor.Direct"/>
+      <Connection Comment="" Destination="CxTime.IN" Source="CxTime" dx1="813.3333333333334"/>
+      <Connection Comment="" Destination="HorizontalCylinder.Direct" Source="RI.DirLinX" dx1="1193.3333333333335"/>
+      <Connection Comment="" Destination="HorizontalCylinder.WorkTime" Source="CxTime.OUT" dx1="293.33333333333337"/>
+      <Connection Comment="" Destination="Gripper.Direct" Source="RI.DirGrip" dx1="3760.0"/>
+      <Connection Comment="" Destination="Gripper.WorkTime" Source="CgTime.OUT" dx1="186.66666666666669"/>
+      <Connection Comment="" Destination="VerticalCylinder.Direct" Source="RI.DirLinY" dx1="5786.666666666667"/>
+      <Connection Comment="" Destination="VerticalCylinder.WorkTime" Source="CyTime.OUT" dx1="160.0"/>
+    </DataConnections>
+  </FBNetwork>
+</FBType>

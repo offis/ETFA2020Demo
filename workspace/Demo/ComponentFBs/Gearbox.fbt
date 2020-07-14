@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Template for an empty basic function block" Name="Gearbox">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2018-02-28" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="Start" Type="Event">
+        <With Var="Ratio"/>
+        <With Var="SpeedIn"/>
+        <With Var="InitPos"/>
+        <With Var="LoadIn"/>
+      </Event>
+      <Event Comment="" Name="Request" Type="Event">
+        <With Var="Ratio"/>
+        <With Var="SpeedIn"/>
+        <With Var="LoadIn"/>
+        <With Var="Direct"/>
+      </Event>
+      <Event Comment="" Name="Stop" Type="Event"/>
+      <Event Comment="" Name="Reset" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="Ready" Type="Event">
+        <With Var="Speed"/>
+        <With Var="Position"/>
+        <With Var="RPM"/>
+        <With Var="Tl"/>
+      </Event>
+      <Event Comment="" Name="Response" Type="Event">
+        <With Var="Speed"/>
+        <With Var="Position"/>
+        <With Var="RPM"/>
+        <With Var="Tl"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" Name="Direct" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="InitPos" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="" Name="Ratio" Type="REAL"/>
+      <VarDeclaration Comment="" Name="SpeedIn" Type="REAL"/>
+      <VarDeclaration Comment="" Name="LoadIn" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" Name="RPM" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Speed" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Position" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Tl" Type="REAL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="Internal Variable" InitialValue="TRUE" Name="bd" Type="BOOL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="tg" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="phi" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="3.1415269" Name="pi" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="dphi" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="t0" Type="TIME"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="omega" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="temp" Type="REAL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="400.0" y="0.0"/>
+      <ECState Comment="" Name="RunState" x="266.6666666666667" y="1466.6666666666667">
+        <ECAction Algorithm="Behavior" Output="Response"/>
+      </ECState>
+      <ECState Comment="" Name="InitState" x="1866.6666666666667" y="266.6666666666667">
+        <ECAction Algorithm="Init" Output="Ready"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForRequest" x="600.0" y="500.0"/>
+      <ECState Comment="" Name="StopState" x="2400.0" y="1200.0">
+        <ECAction Algorithm="StopMotor"/>
+      </ECState>
+      <ECTransition Comment="" Condition="Start" Destination="InitState" Source="START" x="1120.0" y="153.33333333333334"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="InitState" x="1626.6666666666667" y="460.0"/>
+      <ECTransition Comment="" Condition="Request" Destination="RunState" Source="WaitForRequest" x="700.0" y="860.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="RunState" x="960.0" y="853.3333333333334"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="StopState" x="1633.3333333333335" y="1086.6666666666667"/>
+      <ECTransition Comment="" Condition="Stop" Destination="StopState" Source="WaitForRequest" x="2160.0" y="873.3333333333334"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="WaitForRequest" x="726.6666666666667" y="353.33333333333337"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="Behavior">
+      <ST Text="IF (bd = TRUE) THEN &#13;&#10;&#9;bd := FALSE;&#13;&#10;&#9;t0 := NOW_MONOTONIC();&#13;&#10;END_IF;&#13;&#10;omega := Ratio*SpeedIn;&#13;&#10;Tl := Ratio*LoadIn;&#13;&#10;tg := TIME_IN_S_TO_LREAL(NOW_MONOTONIC()-t0);&#13;&#10;t0 := NOW_MONOTONIC();&#13;&#10;dphi := omega*180*tg/pi;&#13;&#10;phi := phi + dphi;&#13;&#10;IF (Direct = TRUE) THEN // Run to LS2&#13;&#10;&#9;IF (phi &gt;= 360) THEN&#13;&#10;&#9;&#9;phi := phi - 360;&#13;&#10;&#9;END_IF;&#13;&#10;ELSE // Run to LS1&#13;&#10;&#9;IF (phi &lt;= -360) THEN&#13;&#10;&#9;&#9;phi := phi + 360;&#13;&#10;&#9;END_IF;&#13;&#10;END_IF;&#13;&#10;Position := phi;&#13;&#10;temp := omega*30/pi;&#13;&#10;RPM := ABS(temp);&#13;&#10;Speed := ABS(omega);"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="Init">
+      <ST Text="bd := TRUE;&#13;&#10;Speed := 0;&#13;&#10;IF (InitPos &gt; 0) THEN&#13;&#10;&#9;IF (InitPos &gt; 180) THEN&#13;&#10;&#9;&#9;phi :=180;&#13;&#10;&#9;ELSE&#13;&#10;&#9;&#9;phi := InitPos;&#13;&#10;&#9;END_IF;&#13;&#10;ELSE&#13;&#10;&#9;phi := 0;&#13;&#10;END_IF;&#13;&#10;Position := phi;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="StopMotor">
+      <ST Text="bd := TRUE;&#13;&#10;Speed := 0;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>

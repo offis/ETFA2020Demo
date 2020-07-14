@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Function Block For Level Sensor" Name="Randn">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2018-01-22" Organization="OFFIS e.V." Version="0.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="Initialization Request" Name="Active" Type="Event">
+        <With Var="ErrorRate"/>
+        <With Var="Mode"/>
+      </Event>
+      <Event Comment="Normal Execution Request" Name="Request" Type="Event">
+        <With Var="IN"/>
+        <With Var="ErrorRate"/>
+        <With Var="Mode"/>
+      </Event>
+      <Event Comment="" Name="Stop" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="Initialization Confirm" Name="Ready" Type="Event"/>
+      <Event Comment="Execution Confirmation" Name="Response" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="0 : Error in (% ); 1 : Error in (+-)" Name="Mode" Type="BOOL"/>
+      <VarDeclaration Comment="Error rate of Sensor" InitialValue="0.05" Name="ErrorRate" Type="REAL"/>
+      <VarDeclaration Comment="set value" Name="IN" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="Signal for controller" Name="OUT" Type="REAL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="RandNum" Type="UINT"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="ErrorR" Type="REAL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="475.0" y="1805.0"/>
+      <ECState Comment="" Name="Behavior" x="2660.0" y="1425.0">
+        <ECAction Algorithm="SensorBehavior" Output="Response"/>
+      </ECState>
+      <ECState Comment="" Name="initState" x="1235.0" y="1425.0">
+        <ECAction Output="Ready"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForRequest" x="1900.0" y="1805.0"/>
+      <ECTransition Comment="" Condition="Active" Destination="initState" Source="START" x="910.0" y="1610.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="Behavior" x="1980.0" y="1400.0"/>
+      <ECTransition Comment="" Condition="Request" Destination="Behavior" Source="WaitForRequest" x="3570.0" y="1965.0"/>
+      <ECTransition Comment="" Condition="Stop" Destination="START" Source="WaitForRequest" x="1355.0" y="2030.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="initState" x="1645.0" y="1650.0"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="SensorBehavior">
+      <ST Text="RandNum := rand()  MOD 1000;&#13;&#10;ErrorR := ErrorRate * (2 * UINT_TO_REAL(RandNum)/1000 - 1);&#13;&#10;IF (Mode = TRUE) THEN&#13;&#10;&#9;OUT := IN + ErrorR;&#13;&#10;ELSE&#13;&#10;&#9;OUT := IN*(1 - ErrorR);&#13;&#10;END_IF;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>

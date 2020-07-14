@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Template for an empty basic function block" Name="Cylinder">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2019-04-25" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="Active" Type="Event"/>
+      <Event Comment="" Name="REQ" Type="Event">
+        <With Var="Direct"/>
+        <With Var="WorkTime"/>
+      </Event>
+      <Event Comment="" Name="Reset" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="Ready" Type="Event"/>
+      <Event Comment="" Name="PosS1" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+      <Event Comment="" Name="PosS2" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" Name="Direct" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="WorkTime" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" Name="OUT" Type="BOOL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="GetTime" Type="TIME"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="0" Name="OldDirect" Type="BOOL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="133.33333333333334" y="133.33333333333334"/>
+      <ECState Comment="" Name="AtS1" x="533.3333333333334" y="1600.0">
+        <ECAction Output="PosS1"/>
+      </ECState>
+      <ECState Comment="" Name="GetTime" x="1866.6666666666667" y="1333.3333333333335">
+        <ECAction Algorithm="GetCTime"/>
+      </ECState>
+      <ECState Comment="" Name="RunState" x="3733.3333333333335" y="1200.0">
+        <ECAction Algorithm="Excecution"/>
+      </ECState>
+      <ECState Comment="" Name="AtS2" x="4000.0" y="266.6666666666667">
+        <ECAction Output="PosS2"/>
+      </ECState>
+      <ECState Comment="" Name="InitState" x="2000.0" y="200.0">
+        <ECAction Output="Ready"/>
+        <ECAction Output="PosS1"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForRequest" x="800.0" y="500.0"/>
+      <ECTransition Comment="" Condition="[Direct &lt;&gt;OldDirect]" Destination="RunState" Source="GetTime" x="3020.0" y="973.3333333333334"/>
+      <ECTransition Comment="" Condition="[OUT = TRUE AND Direct = FALSE]" Destination="AtS1" Source="RunState" x="1873.3333333333335" y="2240.0"/>
+      <ECTransition Comment="" Condition="[OUT = TRUE AND Direct = TRUE]" Destination="AtS2" Source="RunState" x="4160.0" y="746.6666666666667"/>
+      <ECTransition Comment="" Condition="REQ" Destination="GetTime" Source="WaitForRequest" x="1426.6666666666667" y="913.3333333333334"/>
+      <ECTransition Comment="" Condition="[Direct =OldDirect]" Destination="WaitForRequest" Source="GetTime" x="2146.666666666667" y="793.3333333333334"/>
+      <ECTransition Comment="" Condition="Active" Destination="InitState" Source="START" x="1340.0" y="240.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="InitState" x="1660.0" y="380.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="AtS1" x="926.6666666666667" y="826.6666666666667"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="AtS2" x="2820.0" y="606.6666666666667"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="WaitForRequest" x="800.0" y="400.0"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="Excecution">
+      <ST Text="WHILE (TIME_IN_S_TO_LREAL(NOW_MONOTONIC() - GetTime) &lt; WorkTime) DO&#13;&#10;&#9;OUT :=  FALSE;&#13;&#10;END_WHILE;&#13;&#10;OUT :=  TRUE;&#13;&#10;OldDirect := Direct;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="GetCTime">
+      <ST Text="GetTime := NOW_MONOTONIC();"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>

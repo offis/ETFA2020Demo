@@ -1,0 +1,1038 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Name="TCFB" Comment="Timing contract function block">
+	<Identification Standard="61499-2">
+	</Identification>
+	<VersionInfo Organization="OFFIS e.V." Version="1.0" Author="Duc Do Tran" Date="2018-10-23">
+	</VersionInfo>
+	<InterfaceList>
+		<EventInputs>
+			<Event Name="INIT" Type="Event" Comment="">
+				<With Var="Specification"/>
+				<With Var="SetTimeOut"/>
+			</Event>
+			<Event Name="REQ" Type="Event" Comment="">
+			</Event>
+			<Event Name="ReqEvent" Type="Event" Comment="">
+				<With Var="QI"/>
+				<With Var="GetTime"/>
+			</Event>
+			<Event Name="RspEvent" Type="Event" Comment="">
+				<With Var="QI"/>
+				<With Var="GetTime"/>
+			</Event>
+			<Event Name="Reset" Type="Event" Comment="">
+				<With Var="Specification"/>
+				<With Var="SetTimeOut"/>
+				<With Var="GetTime"/>
+			</Event>
+		</EventInputs>
+		<EventOutputs>
+			<Event Name="INITO" Type="Event" Comment="">
+				<With Var="Status"/>
+				<With Var="Infos"/>
+			</Event>
+			<Event Name="CNF" Type="Event" Comment="">
+				<With Var="Infos"/>
+				<With Var="GlTime"/>
+			</Event>
+			<Event Name="Satisfied" Type="Event" Comment="">
+				<With Var="QO"/>
+				<With Var="Status"/>
+				<With Var="VioInfos"/>
+				<With Var="GlTime"/>
+			</Event>
+			<Event Name="Ignored" Type="Event" Comment="">
+				<With Var="Status"/>
+				<With Var="QO"/>
+				<With Var="VioInfos"/>
+				<With Var="GlTime"/>
+			</Event>
+			<Event Name="Violated" Type="Event" Comment="">
+				<With Var="QO"/>
+				<With Var="Status"/>
+				<With Var="Infos"/>
+				<With Var="GlTime"/>
+			</Event>
+		</EventOutputs>
+		<InputVars>
+			<VarDeclaration Name="QI" Type="BOOL" Comment="" InitialValue="1"/>
+			<VarDeclaration Name="GetTime" Type="TIME" Comment="" InitialValue="0"/>
+			<VarDeclaration Name="SetTimeOut" Type="REAL" Comment="" InitialValue="60"/>
+			<VarDeclaration Name="Specification" Type="STRING" Comment=""/>
+		</InputVars>
+		<OutputVars>
+			<VarDeclaration Name="QO" Type="BOOL" Comment=""/>
+			<VarDeclaration Name="GlTime" Type="TIME" Comment=""/>
+			<VarDeclaration Name="VioInfos" Type="STRING" Comment=""/>
+			<VarDeclaration Name="Infos" Type="STRING" Comment=""/>
+			<VarDeclaration Name="Status" Type="STRING" Comment=""/>
+		</OutputVars>
+	</InterfaceList>
+	<BasicFB>
+		<InternalVars>
+			<VarDeclaration Name="Pass" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="ipo" Type="STRING" Comment="Internal Variable" InitialValue="|"/>
+			<VarDeclaration Name="ExceptHdl" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="nsec" Type="STRING" Comment="Internal Variable" InitialValue="ns"/>
+			<VarDeclaration Name="usec" Type="STRING" Comment="Internal Variable" InitialValue="us"/>
+			<VarDeclaration Name="msec" Type="STRING" Comment="Internal Variable" InitialValue="ms"/>
+			<VarDeclaration Name="sec" Type="STRING" Comment="Internal Variable" InitialValue="s"/>
+			<VarDeclaration Name="ob" Type="STRING" Comment="open bracket" InitialValue="["/>
+			<VarDeclaration Name="cb" Type="STRING" Comment="close bracket" InitialValue="]"/>
+			<VarDeclaration Name="ep" Type="STRING" Comment="exclamation point" InitialValue="#"/>
+			<VarDeclaration Name="P1" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="P2" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="P3" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="P4" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="beginP" Type="STRING" Comment="Internal Variable" InitialValue="e("/>
+			<VarDeclaration Name="endP" Type="STRING" Comment="Internal Variable" InitialValue=")"/>
+			<VarDeclaration Name="in" Type="STRING" Comment="Internal Variable" InitialValue="|="/>
+			<VarDeclaration Name="eq" Type="STRING" Comment="Internal Variable" InitialValue="="/>
+			<VarDeclaration Name="qst" Type="STRING" Comment="Internal Variable" InitialValue="-&gt;"/>
+			<VarDeclaration Name="dcm" Type="STRING" Comment="Internal Variable" InitialValue=";"/>
+			<VarDeclaration Name="dbp" Type="STRING" Comment="Internal Variable" InitialValue=":"/>
+			<VarDeclaration Name="AE" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="eExt" Type="STRING" Comment="Internal Variable" InitialValue="}"/>
+			<VarDeclaration Name="bExt" Type="STRING" Comment="Internal Variable" InitialValue="{"/>
+			<VarDeclaration Name="P5" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="ExtCmd" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="tt" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="tunit" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Pattern" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="ReqArr" Type="TIME" Comment="Internal Variable" ArraySize="1000" InitialValue=""/>
+			<VarDeclaration Name="PosV" Type="INT" Comment="Internal Variable" ArraySize="1000" InitialValue=""/>
+			<VarDeclaration Name="NumEV" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="MaxNum" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="MinNum" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Occurr" Type="STRING" Comment="Internal Variable" InitialValue="Occurrence"/>
+			<VarDeclaration Name="React" Type="STRING" Comment="Internal Variable" InitialValue="Reaction"/>
+			<VarDeclaration Name="Age" Type="STRING" Comment="Internal Variable" InitialValue="Age"/>
+			<VarDeclaration Name="Causal" Type="STRING" Comment="Internal Variable" InitialValue="Causality"/>
+			<VarDeclaration Name="Class" Type="STRING" Comment="Internal Variable" InitialValue="::"/>
+			<VarDeclaration Name="RspNum" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Done" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="bd" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Fulfilled" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="RspArr" Type="TIME" Comment="Internal Variable" ArraySize="1000" InitialValue=""/>
+			<VarDeclaration Name="ConstraintType" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="LastPosV" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="CountReq" Type="INT" Comment="Internal Variable" InitialValue="0"/>
+			<VarDeclaration Name="CountRsp" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="i" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="j" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="MaxNum1" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="MinNum1" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="beginP1" Type="STRING" Comment="Internal Variable" InitialValue="q("/>
+			<VarDeclaration Name="ReqNum1" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="RspNum1" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Num" Type="SINT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="ReactCase" Type="USINT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="VNum" Type="INT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="CountReq1" Type="UINT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="CountRsp1" Type="UINT" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Temp" Type="INT" Comment="Internal Variable" ArraySize="1000" InitialValue=""/>
+			<VarDeclaration Name="LastReq" Type="TIME" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="TempStr" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="flag" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="TempStr1" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="FirstTime" Type="TIME" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="ReqTout" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="RspTout" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="t" Type="LREAL" Comment="Internal Variable" ArraySize="1000" InitialValue=""/>
+			<VarDeclaration Name="cma" Type="STRING" Comment="Internal Variable" InitialValue=","/>
+			<VarDeclaration Name="LastTime" Type="TIME" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Te" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="CurrTime" Type="TIME" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="IgnAct" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="StrVar" Type="STRING" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="Timeout" Type="BOOL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="TimeoutVal" Type="REAL" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="beginTimeout" Type="TIME" Comment="Internal Variable" InitialValue=""/>
+			<VarDeclaration Name="ErrorCode" Type="USINT" Comment="Internal Variable" InitialValue=""/>
+		</InternalVars>
+		<ECC>
+			<ECState Name="START" Comment="Initial State" x="933.3333333333334" y="2000.0">
+			</ECState>
+			<ECState Name="PatternAnalysis" Comment="" x="2666.666666666667" y="800.0">
+				<ECAction Algorithm="SpecificationPattern"/>
+			</ECState>
+			<ECState Name="ReqProcessing" Comment="" x="3200.0" y="3333.3333333333335">
+				<ECAction Algorithm="RequestEvent"/>
+			</ECState>
+			<ECState Name="GetTCParameters" Comment="" x="3866.666666666667" y="1200.0">
+				<ECAction Algorithm="ContractPattern"/>
+			</ECState>
+			<ECState Name="GetEventPattern" Comment="" x="6400.0" y="933.3333333333334">
+				<ECAction Algorithm="Classify"/>
+			</ECState>
+			<ECState Name="WaitingForEvent" Comment="" x="7200.0" y="3066.666666666667">
+				<ECAction Algorithm="WaitTime" Output="CNF"/>
+			</ECState>
+			<ECState Name="RspProcessing" Comment="" x="3866.666666666667" y="4000.0">
+				<ECAction Algorithm="ResponseEvent"/>
+			</ECState>
+			<ECState Name="ErrorState" Comment="" x="3200.0" y="1866.6666666666667">
+				<ECAction Algorithm="StateOfError"/>
+			</ECState>
+			<ECState Name="Display" Comment="" x="2133.3333333333335" y="4533.333333333334">
+				<ECAction Algorithm="Display"/>
+			</ECState>
+			<ECState Name="ViolationContract" Comment="" x="1200.0" y="2800.0">
+				<ECAction Algorithm="StateOfViolation" Output="Violated"/>
+				<ECAction Output="CNF"/>
+			</ECState>
+			<ECState Name="Ready" Comment="" x="7466.666666666667" y="2133.3333333333335">
+				<ECAction Algorithm="InitParams" Output="INITO"/>
+			</ECState>
+			<ECState Name="InitParams" Comment="" x="1333.3333333333335" y="1066.6666666666667">
+				<ECAction Algorithm="FirstParams"/>
+			</ECState>
+			<ECState Name="GetEHParameters" Comment="" x="5333.333333333334" y="2000.0">
+				<ECAction Algorithm="EHPattern"/>
+			</ECState>
+			<ECState Name="StopTimeOut" Comment="" x="4933.333333333334" y="5333.333333333334">
+				<ECAction Algorithm="TimeOutExcecution"/>
+			</ECState>
+			<ECState Name="Satisfied" Comment="" x="4933.333333333334" y="4400.0">
+				<ECAction Algorithm="StateOfSatisfy" Output="Satisfied"/>
+			</ECState>
+			<ECState Name="Ignored" Comment="" x="4933.333333333334" y="4800.0">
+				<ECAction Algorithm="StateIgnore" Output="Ignored"/>
+			</ECState>
+			<ECTransition Source="GetTCParameters" Destination="GetEventPattern" Condition="[Pass = TRUE]" Comment="" x="5353.333333333334" y="1013.3333333333334"/>
+			<ECTransition Source="PatternAnalysis" Destination="ErrorState" Condition="[Pass = FALSE]" Comment="" x="3280.0" y="1300.0"/>
+			<ECTransition Source="GetTCParameters" Destination="ErrorState" Condition="[Pass = FALSE]" Comment="" x="3993.3333333333335" y="1500.0"/>
+			<ECTransition Source="ReqProcessing" Destination="ViolationContract" Condition="[Done = TRUE AND Fulfilled = FALSE]" Comment="" x="2820.0" y="3180.0"/>
+			<ECTransition Source="RspProcessing" Destination="ViolationContract" Condition="[Done = TRUE AND Fulfilled = FALSE]" Comment="" x="2266.666666666667" y="3520.0"/>
+			<ECTransition Source="GetEventPattern" Destination="Ready" Condition="[(Done = TRUE) AND (AE = FALSE)]" Comment="" x="7406.666666666667" y="1840.0"/>
+			<ECTransition Source="ViolationContract" Destination="START" Condition="1" Comment="" x="1313.3333333333335" y="2506.666666666667"/>
+			<ECTransition Source="ErrorState" Destination="START" Condition="1" Comment="" x="2273.3333333333335" y="2060.0"/>
+			<ECTransition Source="GetEventPattern" Destination="GetTCParameters" Condition="[Done = FALSE]" Comment="" x="5540.0" y="1486.6666666666667"/>
+			<ECTransition Source="START" Destination="InitParams" Condition="INIT" Comment="" x="1260.0" y="1593.3333333333335"/>
+			<ECTransition Source="InitParams" Destination="PatternAnalysis" Condition="[Pass = TRUE]" Comment="" x="1893.3333333333335" y="853.3333333333334"/>
+			<ECTransition Source="GetEHParameters" Destination="ErrorState" Condition="[Pass = FALSE]" Comment="" x="4693.333333333334" y="1726.6666666666667"/>
+			<ECTransition Source="InitParams" Destination="ErrorState" Condition="[Pass = FALSE]" Comment="" x="2500.0" y="1540.0"/>
+			<ECTransition Source="StopTimeOut" Destination="Display" Condition="[Done = TRUE AND Fulfilled = TRUE]" Comment="" x="3360.0" y="5186.666666666667"/>
+			<ECTransition Source="Display" Destination="Satisfied" Condition="[IgnAct = FALSE]" Comment="" x="4060.0" y="4500.0"/>
+			<ECTransition Source="Display" Destination="Ignored" Condition="[IgnAct = TRUE]" Comment="" x="4133.333333333334" y="4940.0"/>
+			<ECTransition Source="ReqProcessing" Destination="Display" Condition="[Done = TRUE AND Fulfilled = TRUE]" Comment="" x="2600.0" y="4053.3333333333335"/>
+			<ECTransition Source="RspProcessing" Destination="Display" Condition="[Done = TRUE AND Fulfilled = TRUE]" Comment="" x="3426.666666666667" y="4306.666666666667"/>
+			<ECTransition Source="WaitingForEvent" Destination="ViolationContract" Condition="[Timeout = TRUE]" Comment="" x="4486.666666666667" y="2033.3333333333335"/>
+			<ECTransition Source="WaitingForEvent" Destination="START" Condition="Reset" Comment="" x="4206.666666666667" y="2493.3333333333335"/>
+			<ECTransition Source="WaitingForEvent" Destination="ReqProcessing" Condition="ReqEvent[QI = TRUE]" Comment="" x="4873.333333333334" y="3006.666666666667"/>
+			<ECTransition Source="WaitingForEvent" Destination="RspProcessing" Condition="RspEvent[QI = TRUE]" Comment="" x="5920.0" y="3713.3333333333335"/>
+			<ECTransition Source="WaitingForEvent" Destination="ViolationContract" Condition="RspEvent[QI = FALSE]" Comment="" x="4193.333333333334" y="2713.3333333333335"/>
+			<ECTransition Source="WaitingForEvent" Destination="ViolationContract" Condition="ReqEvent[QI = FALSE]" Comment="" x="4680.0" y="2273.3333333333335"/>
+			<ECTransition Source="Satisfied" Destination="WaitingForEvent" Condition="1" Comment="" x="6713.333333333334" y="3933.3333333333335"/>
+			<ECTransition Source="Ignored" Destination="WaitingForEvent" Condition="1" Comment="" x="6873.333333333334" y="4553.333333333334"/>
+			<ECTransition Source="RspProcessing" Destination="WaitingForEvent" Condition="[Done =  FALSE]" Comment="" x="5346.666666666667" y="3486.666666666667"/>
+			<ECTransition Source="ReqProcessing" Destination="WaitingForEvent" Condition="[Done =  FALSE]" Comment="" x="5200.0" y="3233.3333333333335"/>
+			<ECTransition Source="StopTimeOut" Destination="ViolationContract" Condition="[Done = TRUE AND Fulfilled = FALSE]" Comment="" x="1386.6666666666667" y="5253.333333333334"/>
+			<ECTransition Source="WaitingForEvent" Destination="WaitingForEvent" Condition="REQ" Comment="" x="7553.333333333334" y="2873.3333333333335"/>
+			<ECTransition Source="PatternAnalysis" Destination="GetEventPattern" Condition="[Pass = TRUE]" Comment="" x="5306.666666666667" y="820.0"/>
+			<ECTransition Source="GetEHParameters" Destination="Ready" Condition="[Pass = TRUE]" Comment="" x="6753.333333333334" y="2266.666666666667"/>
+			<ECTransition Source="GetEventPattern" Destination="GetEHParameters" Condition="[(Done = TRUE) AND (AE = TRUE)]" Comment="" x="6233.333333333334" y="1620.0"/>
+			<ECTransition Source="StopTimeOut" Destination="WaitingForEvent" Condition="[Done =  FALSE]" Comment="" x="7206.666666666667" y="4720.0"/>
+			<ECTransition Source="Ready" Destination="WaitingForEvent" Condition="REQ" Comment="" x="7713.333333333334" y="2540.0"/>
+		</ECC>
+		<Algorithm Name="SpecificationPattern" Comment="new algorithm">
+			<ST><![CDATA[IF (LEN(Specification) > 0) THEN //Occurrence:: | Occurrence::e(t|=[a;b]ms) | Reaction::q(i|=[39.6,40.4]]s)?e(i|=[19.8,20.2]s)
+	IF (LEN(LEFT(Specification, FIND(Specification,Class))) > 0) THEN 
+		StrVar := LEFT(Specification, FIND(Specification,Class)); 
+		ConstraintType := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1)); // Occurrence| Reaction | Age
+		P1 := RIGHT(Specification, LINT_TO_ULINT(LEN(Specification) - LEN(ConstraintType) - LEN(Class))); // P1 : e(p=5ms:j=1ms) or e(i|=[a;b]ms) or e(p=5ms:j=1ms)# Exception
+		IF (ConstraintType = Occurr) THEN 
+			IF((LEFT(P1, LINT_TO_ULINT(2)) = beginP )AND (RIGHT(P1, LINT_TO_ULINT(1)) = endP)) THEN
+				Num := 1;
+				ReactCase := 0;
+			ELSE
+				Pass := FALSE;
+				ErrorCode := 2;
+				//Infos := "Invalid syntax of specification :: check again syntax e(...)";
+			END_IF;
+		ELSIF ((ConstraintType = React) OR (ConstraintType = Age))  THEN //P1 = q?e(i|=[a;b]ms)[#][{...|...}]Or P1 = q(i|=[a;b]ms)?e(i|=[a;b]ms)[#][{...|...}]
+			StrVar := LEFT(P1, FIND(P1,qst));
+			P2 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1)); //q | q(i|=[a;b]ms)
+			P1 := RIGHT(P1, LINT_TO_ULINT(LEN(P1) - LEN(P2) - LEN(qst))); //e(i|=[a;b]ms)[#][{...|...}]
+			IF(P2 = "q") THEN
+				Num := 1;
+				ReactCase := 1;
+		 	ELSE
+		 		IF (RIGHT(P2, LINT_TO_ULINT(1)) = endP) AND (LEFT(P2, LINT_TO_ULINT(2)) = beginP1) THEN
+			 		ReactCase := 2;
+				 	Num := 2;
+				ELSE
+					Pass := FALSE;
+					ErrorCode := 2;
+					//Infos := "Invalid syntax of specification :: check again syntax q(...)";
+				END_IF;
+			END_IF;		
+			
+			IF ((LEFT(P1, LINT_TO_ULINT(2)) = beginP) AND (LEN(LEFT(P1, FIND(P1,endP))) > 0))  THEN
+				IF (RIGHT(P1, LINT_TO_ULINT(1)) <> endP) THEN
+					IF (LEN(LEFT(P1, FIND(P1,ep))) >0) THEN
+						StrVar := LEFT(P1, FIND(P1,ep));	//....#EXT
+						P3 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1)); //e(i|=[a;b]ms)
+						IF (RIGHT(P3,LINT_TO_ULINT(1)) = endP) THEN
+					 		ExtCmd := RIGHT(P1, LINT_TO_ULINT(LEN(P1) - LEN(P3) -1));//[#][{...|...}]
+					 		P1 := P3;
+					 		IF (LEN(ExtCmd) >= 1) THEN
+						 		IF (LEN(LEFT(ExtCmd, FIND(ExtCmd,bExt))) > 0) THEN
+						 			StrVar := LEFT(ExtCmd, FIND(ExtCmd,bExt));
+						 			P3 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+						 			RspNum := STRING_TO_INT(P3);
+						 			ExtCmd := RIGHT(ExtCmd, LINT_TO_ULINT(LEN(ExtCmd) - LEN(P3)));
+						 			IF (LEN(ExtCmd) >= 5) THEN
+										AE := TRUE;
+									ELSE
+										Pass := FALSE;
+										Infos := "Error:: The exception handling command is failed!!!"; 
+									END_IF; 
+								ELSE
+									ExceptHdl := TRUE;
+									VioInfos := ExtCmd;
+									RspNum := STRING_TO_INT(ExtCmd);
+								END_IF;
+							ELSE
+								Pass := FALSE;
+								Infos := "Error:: The exception handling command is failed!!!"; 
+							END_IF; 
+						ELSE
+							Pass := FALSE;
+							Infos := "Invalid syntax of specification :: check again syntax e(...)";
+						END_IF;
+					ELSE
+						IF (LEN(LEFT(P1, FIND(P1,bExt))) > 0) THEN
+							StrVar := LEFT(P1, FIND(P1,bExt));	
+							P3 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+							IF (RIGHT(P3,LINT_TO_ULINT(1)) = endP) THEN
+								ExtCmd := RIGHT(P1, LINT_TO_ULINT(LEN(P1) - LEN(P3)));
+								P1 := P3;
+								IF (LEN(ExtCmd) >= 5) THEN
+									AE := TRUE;
+								ELSE
+									Pass := FALSE;
+									Infos := "Error:: The exception handling command is failed!!!"; 
+								END_IF; 
+							ELSE
+								Pass := FALSE;
+								Infos := "Invalid syntax of specification :: check syntax e(...) or needs with '#'";
+							END_IF;
+						ELSE
+							Pass := FALSE;
+							Infos := "Error:: that needs begin with '#' or '{'"; 
+						END_IF;
+					END_IF;
+				END_IF;		 	
+			 ELSE
+				Pass := FALSE;
+				Infos := "Invalid syntax of specification :: check again syntax e(...)";
+	 		END_IF; 				
+		ELSIF(ConstraintType = Causal) THEN 
+		
+		ELSE
+			Pass := FALSE;
+			Infos := ConstraintType; //(i|=[39.6,40.4]]s)?e(i|=[19.8,20.2]s)
+			//Infos := "Invalid syntax of specification :: invalid keyword of contract ";
+		END_IF;
+	ELSE
+		Pass := FALSE;
+		Infos := "Invalid syntax of specification :: missing or invalid symbol of class '::' ";
+	END_IF;
+ELSE
+		Pass := FALSE;
+		Infos := "Invalid syntax of specification :: empty specification";
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="RequestEvent" Comment="new algorithm">
+			<ST><![CDATA[IF (GetTime = 0) THEN
+	LastReq := NOW_MONOTONIC();
+ELSE
+	LastReq := GetTime;
+END_IF;
+GlTime := LastReq;
+
+IF (ConstraintType = Occurr) THEN
+	Done := TRUE;
+	IF (bd = TRUE) THEN	
+		FirstTime := LastReq; 
+		bd := FALSE;		
+		TimeoutVal := MaxNum;
+	ELSE
+		IF (TIME_IN_S_TO_LREAL(LastReq - FirstTime) >= MinNum) AND (TIME_IN_S_TO_LREAL(LastReq - FirstTime) <= MaxNum) THEN
+			FirstTime :=  LastReq;
+		ELSE
+			Fulfilled := FALSE;
+			Infos := "Request event is not fulfilled for the requirement of period time.";
+		END_IF;	
+	END_IF;
+	beginTimeout  :=  LastReq;
+ELSIF (ConstraintType = React) THEN
+	flag := FALSE;
+	IF (ReqTout = TRUE) THEN
+		CountRsp := 0;
+		ReqTout := FALSE;
+		TimeoutVal := MaxNum; 
+		beginTimeout  :=  LastReq;
+		IF (VNum > 0) THEN
+			CountReq := CountReq + 1;
+		END_IF;
+		IF (bd = TRUE) THEN	
+			FirstTime := LastReq; 
+			bd := FALSE; 
+		ELSE
+			IF (ReactCase = 2) THEN
+				IF (TIME_IN_S_TO_LREAL(LastReq - FirstTime)< MinNum1) THEN
+					Fulfilled := FALSE;
+					Done := TRUE;
+					VNum := VNum + 1;
+					Infos := "The requested event occurs earlier than the required!!!";
+				ELSIF (TIME_IN_S_TO_LREAL(LastReq - FirstTime) > MaxNum1) THEN
+					Fulfilled := FALSE;
+					Done := TRUE;
+					VNum := VNum + 1;
+					Infos := "The requested event occurs later than the required!!!";
+				ELSE
+					FirstTime := LastReq;
+				END_IF;
+			END_IF;	
+		END_IF;	
+	ELSE //the response event is not fulfilled.
+		Fulfilled := FALSE;
+		Done := TRUE;	
+		VNum := VNum + 1;
+		
+		/*Infos := "Too many request event.";
+		VNum := VNum + 1;
+		IF (TIME_IN_S_TO_LREAL(LastReq - FirstTime)< MinNum1) THEN
+			Fulfilled := FALSE;
+			Done := TRUE;
+			Infos := "The requested event occurs earlier than the required!!!";
+		ELSIF (TIME_IN_S_TO_LREAL(LastReq - FirstTime) > MaxNum1) THEN
+			Fulfilled := FALSE;
+			Done := TRUE;
+			Infos := "The requested event occurs later than the required!!!";
+		ELSE 	
+			CountRsp := 0;
+			ReqTout := FALSE;
+			TimeoutVal := MaxNum; 
+			beginTimeout  :=  LastReq;
+			IF (VNum > 0) THEN
+				CountReq := CountReq + 1;
+			END_IF;
+		END_IF;
+		* 
+
+		IF (ExceptHdl = TRUE) THEN
+			IF (ReactCase = 2) THEN
+				IF (TIME_IN_S_TO_LREAL(LastReq - FirstTime)< MinNum1) THEN
+					Fulfilled := FALSE;
+					Done := TRUE;
+					VNum := VNum + 1;
+					Infos := "The requested event occurs earlier than the required!!!";
+				ELSIF (TIME_IN_S_TO_LREAL(LastReq - FirstTime) > MaxNum1) THEN
+					Fulfilled := FALSE;
+					Done := TRUE;
+					VNum := VNum + 1;
+					Infos := "The requested event occurs later than the required!!!";
+				ELSE 	
+					VNum := VNum + 1;	
+					CountRsp := 0;
+					ReqTout := FALSE;
+					TimeoutVal := MaxNum; 
+					beginTimeout  :=  LastReq;
+					IF (VNum > 0) THEN
+						CountReq := CountReq + 1;
+					END_IF;
+				END_IF;
+			ELSE
+				Fulfilled := FALSE;
+				Done := TRUE;
+				VNum := VNum + 1;
+			END_IF;
+		ELSE
+			Fulfilled := FALSE;
+			Done := TRUE;	
+			VNum := VNum + 1;
+			Infos := "Too many request event.";
+		END_IF;	*/	
+	END_IF;	
+	//----------------------------------------------------------------------ooo
+ELSIF (ConstraintType = Age) THEN 
+		CountReq := CountReq + 1;
+		ReqArr[CountReq] := LastReq;
+		TimeoutVal := MaxNum;
+		beginTimeout := LastReq;
+		/*IF (ReqTout = TRUE) THEN
+		 	ReqTout := FALSE;
+			beginTimeout  :=  LastReq;
+			IF (bd = TRUE) THEN
+				FirstTime := LastReq;
+				bd := FALSE;
+				CountRsp :=0;
+				Done := TRUE;	
+			ELSE	
+				Done := TRUE;	
+				IF (VNum > 0) THEN	
+					CountReq := CountReq + 1;
+				ELSE
+					CountReq := 1;
+					VNum := 0;
+				END_IF; 
+				IF (ReactCase = 2) THEN
+					IF (TIME_IN_S_TO_LREAL(LastReq - FirstTime)< MinNum1) THEN
+						Fulfilled := FALSE;
+						VNum := VNum + 1;
+						Status := "The requested event occurs earlier than the required!!!";
+					ELSIF (TIME_IN_S_TO_LREAL(LastReq - FirstTime) > MaxNum1) THEN
+						Fulfilled := FALSE;
+						VNum := VNum + 1;
+						Status := "The requested event occurs later than the required!!!";
+					ELSE
+						TimeoutVal := MaxNum1 - MinNum; 
+						FirstTime := LastReq;
+					END_IF;
+				ELSE
+					TimeoutVal := SetTimeOut - MinNum; 
+					FirstTime := LastReq;
+				END_IF;	
+				
+				IF (Fulfilled = TRUE) THEN	
+					j := 0;
+					LastPosV := 0;
+					IF (CountRsp > 0) THEN
+						TempStr := "Set of backward times: ";
+						FOR i := 1 TO CountRsp DO
+							t[i] :=TIME_IN_S_TO_LREAL(LastReq - RspArr[i]);
+							IF (t[i] > MaxNum) THEN
+								IF(RspArr[i] <> 0) THEN
+									LastPosV := i;
+								END_IF;
+							ELSIF (t[i] >= MinNum) AND (t[i] <= MaxNum) THEN
+								j := j + 1;
+								LastPosV := i;
+							ELSE
+								//EXIT;
+							END_IF;		
+							TempStr1 := CONCAT(LREAL_TO_STRING(t[i]),ipo);
+							TempStr := CONCAT(TempStr,TempStr1);
+						END_FOR;
+						Infos := TempStr;
+					END_IF;
+					IF (RspNum <> j) THEN
+						Fulfilled := FALSE; 	
+						IF (ExceptHdl = TRUE) THEN		
+							VNum := VNum + 1;
+							IF (VNum <= NumEV) THEN
+								Fulfilled := TRUE;
+								PosV[VNum] :=CountReq;
+								IgnAct := TRUE;
+							ELSE
+								Infos := "Number of violation is exceed the allowed times of exception handling";
+								VNum := VNum + 1;
+							END_IF;	
+						ELSE
+							Infos := "Number of response times do not meet requirement";	
+							VNum := VNum + 1;
+						END_IF;
+					END_IF;	
+					
+					IF (Fulfilled = TRUE) THEN
+						IF (LastPosV > 0) THEN
+							CountRsp := CountRsp - LastPosV;
+							IF (CountRsp > 0) THEN
+								FOR i := 1 TO CountRsp DO
+									RspArr[i] := RspArr[i +LastPosV];
+									RspArr[i +LastPosV] := 0;
+								END_FOR;							
+							ELSE
+								CountRsp := 0;
+								FOR i := 1 TO LastPosV DO
+									RspArr[i] := 0;
+								END_FOR;		
+							END_IF;
+						END_IF;
+					END_IF;
+				END_IF;
+			END_IF;
+		ELSE
+			Fulfilled := FALSE;
+			Done := TRUE;	
+			VNum := VNum + 1;
+			Infos := "Too many request event.";
+		END_IF; */
+		
+
+///=================================
+		/*IF (bd = FALSE) THEN			
+			IF (ReactCase = 2) THEN
+				TimeoutVal := MaxNum1;
+			ELSE
+				TimeoutVal := MaxNum;//SetTimeOut - Te;
+			END_IF;
+			TempStr := "Reaction time Te = ";
+			TempStr1 := REAL_TO_STRING(Te);
+			Infos := CONCAT(TempStr,TempStr1);	
+		ELSE
+			Infos := "Waiting for first response event.";
+		END_IF;	*/
+///================================
+ELSE
+	Done := FALSE;
+END_IF;
+
+]]></ST>
+		</Algorithm>
+		<Algorithm Name="ResponseEvent" Comment="new algorithm">
+			<ST><![CDATA[CurrTime := NOW_MONOTONIC();
+IF(ConstraintType <> Occurr) THEN
+	Te := TIME_IN_S_TO_LREAL(CurrTime - LastReq);
+	Infos := "";
+	IF (ConstraintType = React) THEN		
+		IF(bd = FALSE) THEN
+			IF (Te >= MinNum) AND (Te <= MaxNum) THEN
+				CountRsp := CountRsp + 1;                                    
+				IF (CountRsp = RspNum) THEN
+					Done := TRUE;
+					ReqTout := TRUE;	 
+					beginTimeout := CurrTime; 
+					IF (ReactCase = 2) THEN
+						TimeoutVal := MaxNum1 - Te;
+					ELSE
+						TimeoutVal := SetTimeOut  - Te; 
+					END_IF;
+				ELSIF  (CountRsp < RspNum) THEN
+					TempStr := "Number of response event: ";
+					TempStr1 := INT_TO_STRING(CountRsp);
+					 Infos := CONCAT(TempStr,TempStr1);	
+				ELSE
+					IF (ExceptHdl = TRUE) THEN		
+						IF (flag = FALSE) THEN
+							flag := TRUE;
+							VNum := VNum + 1;
+							IF (VNum <= NumEV) THEN
+								PosV[VNum] :=CountReq;
+								VioInfos := INT_TO_STRING(CountReq);
+								IgnAct := TRUE;
+								TempStr := INT_TO_STRING(RspNum);
+								TempStr1 := INT_TO_STRING(CountRsp);
+								TempStr1 := CONCAT(TempStr1,ipo);	
+								TempStr := CONCAT(TempStr1,TempStr);
+								TempStr1 := "Satisfied RspEv | Reqiured RspEv: ";
+								Infos := CONCAT(TempStr1,TempStr);	
+								Done := TRUE;
+							ELSE
+								Fulfilled := FALSE;
+								VNum := VNum + 1;
+								Infos := "Number of violation is exceed the allowed times of exception handling";		
+								Done := TRUE;					
+							END_IF;	
+						ELSE
+							TempStr := INT_TO_STRING(RspNum);
+							TempStr1 := INT_TO_STRING(CountRsp);
+							TempStr1 := CONCAT(TempStr1,ipo);	
+							TempStr := CONCAT(TempStr1,TempStr);
+							TempStr1 := "Satisfied RspEv | Reqiured RspEv: ";
+							Infos := CONCAT(TempStr1,TempStr);	
+						END_IF;
+					ELSE
+						Fulfilled := FALSE;
+						VNum := VNum + 1;
+						Infos := "Number of response event is exceed the desired times";
+						Done := TRUE;
+					END_IF;
+				END_IF;
+			ELSIF (Te > MaxNum) THEN	
+				IF (CountRsp >= RspNum) THEN
+					TempStr := INT_TO_STRING(RspNum);
+					TempStr1 := INT_TO_STRING(CountRsp);
+					TempStr1 := CONCAT(TempStr1,ipo);	
+					TempStr := CONCAT(TempStr1,TempStr);
+					TempStr1 := "Satisfied RspEv | Reqiured RspEv: ";
+					Infos := CONCAT(TempStr1,TempStr);	
+				END_IF;
+			ELSE
+				Infos := "Waiting for next response event.";	
+				beginTimeout := LastTime; 
+				TimeoutVal := MaxNum - Te;
+			END_IF;
+		ELSE 
+			Infos := "Waiting for first request event.";
+		END_IF;
+	ELSIF (ConstraintType = Age) THEN	
+		j :=0;
+		IF (CountReq > 0) THEN
+			TempStr := "Set of backward times: ";
+			FOR i := 1 TO CountReq DO
+				t[i] :=TIME_IN_S_TO_LREAL(CurrTime - ReqArr[i]);
+				IF (t[i] >= MinNum) AND (t[i] <= MaxNum) THEN
+					j := j + 1;
+					TempStr1 := CONCAT(LREAL_TO_STRING(t[i]),ipo);
+					TempStr := CONCAT(TempStr,TempStr1);
+				END_IF;						
+			END_FOR;
+			Infos := TempStr;
+			IF ( j <> 1) THEN
+				Fulfilled := FALSE; 	
+				Done := TRUE;	
+				IF (ExceptHdl = TRUE) THEN		
+					VNum := VNum + 1;
+					IF (VNum <= NumEV) THEN
+						Fulfilled := TRUE;
+						PosV[VNum] :=CountReq;
+						IgnAct := TRUE;
+					ELSE
+						Infos := "Number of violation is exceed the allowed times of exception handling";
+						VNum := VNum + 1;
+					END_IF;	
+				ELSE
+					Infos := "Number of response times do not meet requirement";	
+					VNum := VNum + 1;
+				END_IF;
+			ELSE
+				CountReq := 0;
+				Done := TRUE;	
+				beginTimeout := CurrTime; 
+				Te := SetTimeOut  -  TIME_IN_S_TO_LREAL(CurrTime - LastReq);
+				IF (ReactCase = 2) THEN
+					TimeoutVal := MaxNum1 - Te;
+				ELSE
+					TimeoutVal:= SetTimeOut  -  Te;
+				END_IF;
+			END_IF;		
+		ELSE
+			Fulfilled := FALSE; 	
+			Infos := "No request!";	
+		END_IF;
+		
+	ELSE
+	
+	END_IF;		
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="Classify" Comment="new algorithm">
+			<ST><![CDATA[IF (Num = 2)  THEN
+	Pattern  := RIGHT(P2, LINT_TO_ULINT(LEN(P2) - LEN(beginP1))); // P1 : q(i|=[a;b]ms)
+ELSIF (Num = 1) THEN
+	Pattern := RIGHT(P1, LINT_TO_ULINT(LEN(P1) - LEN(beginP)));
+ELSE
+	Done := TRUE;
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="InitParams" Comment="new algorithm">
+			<ST><![CDATA[beginTimeout := NOW_MONOTONIC();
+LastTime := NOW_MONOTONIC();
+CurrTime := NOW_MONOTONIC();
+bd := TRUE;
+Timeout := FALSE;
+IF (CountRsp > 0) THEN
+	FOR i := 1 TO CountRsp DO
+		RspArr[i] := 0;
+	END_FOR;
+END_IF;
+ReqTout := TRUE;
+VNum := 0;
+IF (ConstraintType = Age) THEN 
+	CountReq :=0;
+ELSE
+	CountReq :=1;
+END_IF;
+IF (ReqNum1 > 0) THEN
+	NumEV := ReqNum1 - RspNum1;
+END_IF;
+Fulfilled := TRUE;]]></ST>
+		</Algorithm>
+		<Algorithm Name="StateOfSatisfy" Comment="new algorithm">
+			<ST><![CDATA[IF (ConstraintType = Age) THEN		
+	//TempStr1 := "||";
+	//TempStr := LREAL_TO_STRING(TIME_IN_S_TO_LREAL(LastReq - RspArr[1]));
+	//TempStr1 := CONCAT(TempStr,TempStr1);
+	//Status:= CONCAT(TempStr1,LREAL_TO_STRING(TIME_IN_S_TO_LREAL(LastReq - RspArr[2])));
+	Status := "Contract is satisfied.";
+ELSE
+	TempStr := ": Contract is satisfied.";
+	TempStr1 := "Te = :";
+	TempStr1 := CONCAT(TempStr1,REAL_TO_STRING(Te));
+	Status:= CONCAT(TempStr1,TempStr);
+END_IF;
+]]></ST>
+		</Algorithm>
+		<Algorithm Name="StateOfViolation" Comment="new algorithm">
+			<ST><![CDATA[QO := FALSE;
+IF (QI = FALSE) THEN
+	Status := "Invalid status";
+	Infos := "Not allowed QI = 0.";
+ELSE
+	Status := "Contract is violated.";
+	TempStr := "Number of violation: ";
+	TempStr1 := INT_TO_STRING(VNum+1);
+	Infos := CONCAT(TempStr,TempStr1);	
+	IF (Timeout = TRUE) THEN
+		VioInfos := "Time out";	
+	ELSE
+		TempStr := "Mearsured Time: ";
+		TempStr1 := "Te = ";
+		TempStr1 := CONCAT(TempStr1,REAL_TO_STRING(Te));
+		VioInfos := CONCAT(TempStr,TempStr1);	
+	END_IF;
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="StateOfError" Comment="new algorithm">
+			<ST><![CDATA[QO := FALSE;
+Status := P1;//"An error has occurred!";]]></ST>
+		</Algorithm>
+		<Algorithm Name="ContractPattern" Comment="new algorithm">
+			<ST><![CDATA[IF (LEN(LEFT(Pattern, FIND(Pattern,endP))) > 0 ) THEN 
+	StrVar := LEFT(Pattern, FIND(Pattern,endP));			// P1 :  i|=[a;b]ms
+	P5 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+	StrVar := LEFT(P5, FIND(P5,in));	
+	IF (LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1)) = "i") THEN 
+		P3 := RIGHT(P5, LINT_TO_ULINT(LEN(P5) - LEN(in) - 1));//P3 := "[a;b]ms"
+		IF (LEFT(P3, FIND(P3, nsec)) <> 0) THEN
+			tunit := nsec;
+			tt := 0.000000001;
+		ELSIF (LEFT(P3, FIND(P3, usec)) <> 0) THEN
+			tunit := usec;
+			tt := 0.000001;
+		ELSIF (LEFT(P3, FIND(P3, msec)) <> 0) THEN
+			tunit := msec;
+			tt := 0.001;
+		ELSIF (LEFT(P3, FIND(P3, sec)) <> 0) THEN
+			tunit := sec;
+			tt := 1;
+		ELSE
+			Pass := FALSE;
+			Infos := "Error :: invalid unit  of time";
+		END_IF;
+	ELSE
+		Pass := FALSE;
+		Infos := "Error :: invalid variable of specification for time interval";
+	END_IF;
+	
+	IF (Pass = TRUE) THEN
+		StrVar :=  LEFT(P3, FIND(P3, tunit));//P2 := "[a;b]"
+		P3 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+		IF ((LEFT(P3, LINT_TO_ULINT(1)) = ob) AND (RIGHT(P3, LINT_TO_ULINT(1)) = cb)) THEN	
+			IF (LEN(LEFT(P3, FIND(P3,cma))) > 0) THEN  
+				StrVar := LEFT(P3, FIND(P3,cma));  //P3 := "[a"
+				P4 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+				P5 := RIGHT(P3, LINT_TO_ULINT(LEN(P3) - LEN(P4) - 1));//P2 := "b]"
+				IF (LEN(RIGHT(P5, LINT_TO_ULINT(LEN(P5) - 1))) > 0) THEN  
+					P4 := RIGHT(P4, LINT_TO_ULINT(LEN(P4) - 1)); //P3 := "a"					
+					StrVar := LEFT(P5, FIND(P5,cb));
+					P5 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+					MinNum :=  STRING_TO_REAL(P4)*tt;
+					MaxNum :=  STRING_TO_REAL(P5)*tt;		
+					IF (MaxNum <= MinNum) THEN
+						Pass := FALSE;
+						Infos := "Error :: check again the interval values  [min,max]?';'";
+					ELSE
+						IF (Num = 2) THEN
+							MinNum1 :=  MinNum;
+							MaxNum1 :=  MaxNum;
+						END_IF;
+					END_IF;
+				ELSE
+					Pass := FALSE;
+					Infos := "Error :: empty or unvalid timing data ';'";
+				END_IF;
+			ELSE
+				Pass := FALSE;
+				Infos := "Error :: missing ',' between two values";
+			END_IF;
+		ELSE
+			Pass := FALSE;
+			Infos := "Invalid syntax of specification :: missing or unvalid symbol of interval [...,...]";
+		END_IF;
+	END_IF;			
+ELSE
+	Pass := FALSE;
+	Infos := "Error :: unkown variable of specification";
+END_IF;								
+Num := Num - 1;		]]></ST>
+		</Algorithm>
+		<Algorithm Name="FirstParams" Comment="new algorithm">
+			<ST><![CDATA[Infos := "";
+Status := "";
+VioInfos := "";
+Pass := TRUE;
+Done := FALSE;
+AE := FALSE;
+ExceptHdl := FALSE;
+ReqNum1 := 0;
+RspNum1 := 0;
+RspNum := 1;
+//ReqNum := 1;
+ReactCase := 0;
+IF (SetTimeOut <=0) THEN
+	Pass := FALSE;
+	Infos := "Invalid timeout value";
+ELSE
+	TimeoutVal := SetTimeOut;
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="WaitTime" Comment="new algorithm">
+			<ST><![CDATA[Fulfilled := TRUE;
+Done := FALSE;	
+Timeout := FALSE;
+IgnAct := FALSE;
+IF (TIME_IN_S_TO_LREAL(NOW_MONOTONIC() - beginTimeout) > TimeoutVal) AND (bd = FALSE) THEN
+	Timeout := TRUE;
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="EHPattern" Comment="new algorithm">
+			<ST><![CDATA[ ExceptHdl := TRUE;
+IF ((LEFT(ExtCmd,  LINT_TO_ULINT(1)) = bExt)  AND (RIGHT(ExtCmd,  LINT_TO_ULINT(1)) = eExt)) THEN 
+	IF (ConstraintType = Occurr) THEN 
+		Pass := FALSE;
+		Infos := "Error:: This command does not required for this case"; 
+	ELSE		
+		 IF (LEN(LEFT(ExtCmd, FIND(ExtCmd,ipo))) > 0) THEN 
+			StrVar := LEFT(ExtCmd, FIND(ExtCmd,ipo)); 
+			P4 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));//P4 := "{a"
+			P5 := RIGHT(ExtCmd, LINT_TO_ULINT(LEN(ExtCmd) - LEN(P4) - 1));//P2 := "b}"
+			IF ((LEN(P4) > 1) AND (LEN(P5) > 1)) THEN  
+				P4 := RIGHT(P4, LINT_TO_ULINT(LEN(P4) - 1)); //P4 := "a"					
+				StrVar := LEFT(P5, FIND(P5,eExt));
+				P5 := LEFT(StrVar, LINT_TO_ULINT(LEN(StrVar) - 1));
+				RspNum1 :=  STRING_TO_INT(P4);
+				ReqNum1 :=  STRING_TO_INT(P5);
+			ELSE
+				Pass := FALSE;
+				Infos := "Error:: Missing input or/and output value for exception handling"; 
+			END_IF;
+		ELSE
+			Pass := FALSE;
+			Infos := "Error:: Missing symbol '|'"; 
+		END_IF;
+	END_IF;
+ELSE
+	IF (LEN(LEFT(Specification, FIND(Specification,ep))) = 0) THEN
+		Pass := FALSE;
+		Infos := "Error:: Check again syntax {...|...}"; 
+	END_IF;
+END_IF;]]></ST>
+		</Algorithm>
+		<Algorithm Name="TimeOutExcecution" Comment="new algorithm">
+			<ST><![CDATA[beginTimeout := NOW_MONOTONIC();
+Fulfilled := FALSE;
+Done := TRUE;
+/* 
+IF (ReqTout = TRUE) THEN
+	Infos := "Timout for request event!!!";
+	VNum := VNum + 1;
+ELSE
+	IF (ConstraintType = React) THEN	
+		IF (ExceptHdl = TRUE) AND (flag = FALSE) THEN
+			VNum := VNum + 1;	
+			IF (VNum <= NumEV) THEN
+				Fulfilled := TRUE;
+				ReqTout := TRUE;
+				PosV[VNum] :=CountReq;	
+				VioInfos := INT_TO_STRING(CountReq);
+				TempStr := INT_TO_STRING(RspNum);
+				TempStr1 := INT_TO_STRING(CountRsp);
+				TempStr1 := CONCAT(TempStr1,ipo);	
+				TempStr := CONCAT(TempStr1,TempStr);
+				TempStr1 := "Satisfied RspEv | Reqiured RspEv: ";
+				Infos := CONCAT(TempStr1,TempStr);	
+				flag := TRUE;
+				IgnAct := TRUE;
+				IF (ReactCase = 2) THEN
+					TimeoutVal := MaxNum1 -  TIME_IN_S_TO_LREAL(beginTimeout - LastReq);
+				ELSE
+					TimeoutVal := SetTimeOut -  TIME_IN_S_TO_LREAL(beginTimeout - LastReq); 
+				END_IF;
+			ELSE
+				Fulfilled := FALSE;
+				Infos := "Number of violation is exceed the allowed times of exception handling";
+				VNum := VNum + 1;
+			END_IF;
+		ELSE
+			Done := TRUE;
+			Fulfilled := FALSE;
+			Infos := "Timeout.";
+		END_IF;
+	ELSE
+		IF (ConstraintType = Age) THEN	
+			ReqTout := TRUE;
+			IF (ReactCase = 2) THEN
+				TimeoutVal := MaxNum1 - TIME_IN_S_TO_LREAL(beginTimeout - LastReq);
+			ELSE
+				TimeoutVal := SetTimeOut  - TIME_IN_S_TO_LREAL(beginTimeout - LastReq); 
+			END_IF;
+			TempStr := INT_TO_STRING(RspNum);
+			TempStr1 := INT_TO_STRING(CountRsp);
+			TempStr1 := CONCAT(TempStr1,ipo);	
+			Infos := CONCAT(TempStr1,TempStr);	
+		ELSE
+			
+		END_IF;
+	END_IF;
+END_IF;*/
+//TempStr := INT_TO_STRING(RspNum);
+//TempStr1 := INT_TO_STRING(CountRsp);
+//TempStr1 := CONCAT(TempStr1,ipo);	
+//Infos := CONCAT(TempStr1,TempStr);	]]></ST>
+		</Algorithm>
+		<Algorithm Name="Display" Comment="new algorithm">
+			<ST><![CDATA[QO := TRUE;
+IF (VNum > 0) THEN
+	IF (CountReq > ReqNum1) THEN 
+		CountReq := ReqNum1;
+		VioInfos := "";
+		TempStr := "List of violation position: ";
+		FOR i :=1 TO VNum DO
+			Temp[i] := PosV[i] - 1;
+			IF (Temp[i] < 0) THEN
+				PosV[i] := 0;
+			 	EXIT;
+			 END_IF;	
+		END_FOR;
+		IF (Temp[1]  = 0) THEN
+			VNum := VNum - 1; 
+			IF (VNum > 0) THEN
+				FOR j :=1 TO VNum DO
+					PosV[j] := Temp[j+1];
+					TempStr1 := CONCAT(INT_TO_STRING(PosV[j]),ipo);
+					TempStr := CONCAT(TempStr,TempStr1);
+				END_FOR;
+			ELSE
+				VNum := 0;
+				CountReq := 1;
+				TempStr := "";
+			END_IF;	
+		ELSE
+			FOR j :=1 TO VNum DO
+				PosV[j] := Temp[j];
+				TempStr1 := CONCAT(INT_TO_STRING(PosV[j]),ipo);
+				TempStr := CONCAT(TempStr,TempStr1);
+			END_FOR;	
+		END_IF;	
+	ELSE
+		VioInfos := "";
+		TempStr := "List of violation position of contract: ";
+		FOR j :=1 TO VNum DO
+			TempStr1 := CONCAT(INT_TO_STRING(PosV[j]),ipo);
+			TempStr := CONCAT(TempStr,TempStr1);
+		END_FOR;	
+	END_IF;
+	VioInfos := TempStr;
+ELSE
+	VNum := 0;
+	CountReq := 1;
+	VioInfos := "No errors";	
+END_IF;	]]></ST>
+		</Algorithm>
+		<Algorithm Name="StateIgnore" Comment="new algorithm">
+			<ST><![CDATA[IF (ConstraintType = Age) THEN		
+	Status := ": Contract is ignored by exception handling.";
+ELSE
+	TempStr := ": Contract is ignored by exception handling.";
+	TempStr1 := "Te = :";
+	TempStr1 := CONCAT(TempStr1,REAL_TO_STRING(Te));
+	Status:= CONCAT(TempStr1,TempStr);
+END_IF;]]></ST>
+		</Algorithm>
+	</BasicFB>
+</FBType>

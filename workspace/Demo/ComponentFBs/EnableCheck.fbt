@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Template for an empty basic function block" Name="EnableCheck">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2018-06-08" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="REQ" Type="Event">
+        <With Var="QIi"/>
+        <With Var="QIt"/>
+      </Event>
+      <Event Comment="" Name="Stop" Type="Event">
+        <With Var="QIi"/>
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="Satisfied" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+      <Event Comment="" Name="Violated" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="QIt" InitialValue="1" Name="QIi" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="QIt" Type="BOOL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" Name="OUT" Type="BOOL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="546.6666666666667" y="420.0"/>
+      <ECState Comment="" Name="SetInitValue" x="1800.0" y="600.0">
+        <ECAction Algorithm="Init" Output="Satisfied"/>
+      </ECState>
+      <ECState Comment="" Name="UpdateValue" x="1900.0" y="1700.0">
+        <ECAction Algorithm="Update" Output="Satisfied"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForRequest" x="2000.0" y="1000.0"/>
+      <ECState Comment="" Name="State" x="800.0" y="1700.0">
+        <ECAction Algorithm="Update" Output="Violated"/>
+      </ECState>
+      <ECTransition Comment="" Condition="REQ[QIi = TRUE]" Destination="SetInitValue" Source="START" x="1420.0" y="586.6666666666667"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="SetInitValue" x="2106.666666666667" y="820.0"/>
+      <ECTransition Comment="" Condition="REQ[QIt = TRUE]" Destination="UpdateValue" Source="WaitForRequest" x="2586.666666666667" y="1413.3333333333335"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="UpdateValue" x="2046.6666666666667" y="1346.6666666666667"/>
+      <ECTransition Comment="" Condition="Stop" Destination="START" Source="WaitForRequest" x="1386.6666666666667" y="933.3333333333334"/>
+      <ECTransition Comment="" Condition="REQ[QIt = FALSE]" Destination="State" Source="WaitForRequest" x="1253.3333333333335" y="1366.6666666666667"/>
+      <ECTransition Comment="" Condition="1" Destination="START" Source="State" x="746.6666666666667" y="1140.0"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="Init">
+      <ST Text="OUT := QIi;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="Update">
+      <ST Text="OUT := QIt;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>

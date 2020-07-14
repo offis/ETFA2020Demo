@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System Name="Demo" Comment="">
+	<Identification>
+	</Identification>
+	<VersionInfo Version="1.0" Author="Duc Do Tran" Date="2020-01-11">
+	</VersionInfo>
+	<Application Name="SystemWithoutContract" Comment="">
+		<SubAppNetwork>
+			<FB Name="LS2" Type="OpticSensor" Comment="" x="7200.0" y="1600.0">
+				<Parameter Name="RateDetect" Value="0.012"/>
+				<Parameter Name="PutPosition" Value="90"/>
+			</FB>
+			<FB Name="PnP" Type="PlantFB" Comment="" x="5200.0" y="533.3333333333334">
+				<Parameter Name="InitPos" Value="0"/>
+				<Parameter Name="GearRatio" Value="0.1"/>
+				<Parameter Name="CxTime" Value="0.35"/>
+				<Parameter Name="CyTime" Value="0.18"/>
+				<Parameter Name="CgTime" Value="0.09"/>
+				<Parameter Name="U" Value="24"/>
+			</FB>
+			<FB Name="LS1" Type="Sensor" Comment="" x="7200.0" y="533.3333333333334">
+				<Parameter Name="Direct" Value="1"/>
+				<Parameter Name="LimPos" Value="0"/>
+			</FB>
+			<FB Name="LS3" Type="Sensor" Comment="" x="7200.0" y="2666.666666666667">
+				<Parameter Name="Direct" Value="0"/>
+				<Parameter Name="LimPos" Value="180"/>
+			</FB>
+			<FB Name="Controller" Type="ControllerFB" Comment="" x="2400.0" y="533.3333333333334">
+				<Parameter Name="Load" Value="0.2"/>
+				<Parameter Name="CtrlPos" Value="15"/>
+				<Parameter Name="StopPos1" Value="90"/>
+				<Parameter Name="StopPos2" Value="180"/>
+			</FB>
+			<FB Name="AppearanceOfWP" Type="SupplyConv" Comment="" x="933.3333333333334" y="2000.0">
+			</FB>
+			<FB Name="ExecutionAtPressMachine" Type="E_DELAY" Comment="" x="666.6666666666667" y="1066.6666666666667">
+				<Parameter Name="DT" Value="T#4s"/>
+			</FB>
+			<FB Name="CycleForOccurrenceOfWP" Type="E_DELAY" Comment="" x="933.3333333333334" y="2933.3333333333335">
+				<Parameter Name="DT" Value="T#6s"/>
+			</FB>
+			<FB Name="TIMER_CYCLE" Type="E_CYCLE" Comment="" x="1066.6666666666667" y="400.0">
+				<Parameter Name="DT" Value="T#80ms"/>
+			</FB>
+			<EventConnections>
+				<Connection Source="PnP.CNF" Destination="LS1.Request" Comment=""/>
+				<Connection Source="PnP.CNF" Destination="LS2.Request" Comment="" dx1="566.6666666666667"/>
+				<Connection Source="PnP.CNF" Destination="LS3.Request" Comment="" dx1="566.6666666666667"/>
+				<Connection Source="PnP.INITO" Destination="LS1.Active" Comment=""/>
+				<Connection Source="LS1.Ready" Destination="LS2.Active" Comment="" dx1="80.0" dx2="80.0" dy="833.3333333333334"/>
+				<Connection Source="LS2.Ready" Destination="LS3.Active" Comment="" dx1="80.0" dx2="80.0" dy="826.6666666666667"/>
+				<Connection Source="Controller.CNF" Destination="PnP.REQ" Comment=""/>
+				<Connection Source="Controller.INITO" Destination="PnP.INIT" Comment=""/>
+				<Connection Source="AppearanceOfWP.WpExist" Destination="Controller.Sp" Comment="" dx1="140.0"/>
+				<Connection Source="LS1.Response" Destination="AppearanceOfWP.LS1Req" Comment="" dx1="80.0" dx2="80.0" dy="-406.6666666666667"/>
+				<Connection Source="LS1.Response" Destination="Controller.LS1" Comment="" dx1="80.0" dx2="246.66666666666669" dy="-346.6666666666667"/>
+				<Connection Source="LS2.Response" Destination="Controller.LS2" Comment="" dx1="80.0" dx2="246.66666666666669" dy="-1366.6666666666667"/>
+				<Connection Source="LS3.Response" Destination="Controller.LS3" Comment="" dx1="93.33333333333334" dx2="246.66666666666669" dy="-2513.3333333333335"/>
+				<Connection Source="ExecutionAtPressMachine.EO" Destination="Controller.Sf" Comment="" dx1="346.6666666666667"/>
+				<Connection Source="ExecutionAtPressMachine.EO" Destination="ExecutionAtPressMachine.STOP" Comment="" dx1="133.33333333333334" dx2="186.66666666666669" dy="473.33333333333337"/>
+				<Connection Source="CycleForOccurrenceOfWP.EO" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="-226.66666666666669"/>
+				<Connection Source="CycleForOccurrenceOfWP.EO" Destination="CycleForOccurrenceOfWP.STOP" Comment="" dx1="80.0" dx2="80.0" dy="-246.66666666666669"/>
+				<Connection Source="LS3.Response" Destination="CycleForOccurrenceOfWP.START" Comment="" dx1="80.0" dx2="260.0" dy="686.6666666666667"/>
+				<Connection Source="LS3.Ready" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="786.6666666666667"/>
+				<Connection Source="LS2.Response" Destination="ExecutionAtPressMachine.START" Comment="" dx1="80.0" dx2="160.0" dy="-1473.3333333333335"/>
+				<Connection Source="TIMER_CYCLE.EO" Destination="Controller.REQ" Comment="" dx1="626.6666666666667"/>
+			</EventConnections>
+			<DataConnections>
+				<Connection Source="PnP.Position" Destination="LS3.Position" Comment="" dx1="566.6666666666667"/>
+				<Connection Source="PnP.Position" Destination="LS2.Position" Comment="" dx1="566.6666666666667"/>
+				<Connection Source="PnP.Position" Destination="LS1.Position" Comment=""/>
+				<Connection Source="Controller.PWM" Destination="PnP.PWM" Comment="" dx1="440.0"/>
+				<Connection Source="AppearanceOfWP.Workpiece" Destination="Controller.Workpiece" Comment="" dx1="246.66666666666669"/>
+				<Connection Source="PnP.Position" Destination="Controller.Position" Comment="" dx1="80.0" dx2="80.0" dy="1800.0"/>
+			</DataConnections>
+			<AdapterConnections>
+				<Connection Source="Controller.RI" Destination="PnP.RI" Comment="" dx1="440.0"/>
+			</AdapterConnections>
+		</SubAppNetwork>
+	</Application>
+	<Application Name="SystemApplyTimingContracts" Comment="">
+		<SubAppNetwork>
+			<FB Name="LS2" Type="OpticSensor" Comment="" x="10800.0" y="3200.0">
+				<Parameter Name="RateDetect" Value="0.012"/>
+				<Parameter Name="PutPosition" Value="90"/>
+			</FB>
+			<FB Name="ExecutionAtPressMachine" Type="E_DELAY" Comment="" x="1733.3333333333335" y="2666.666666666667">
+				<Parameter Name="DT" Value="T#4000ms"/>
+			</FB>
+			<FB Name="SplitFirstOccurOfLS1" Type="SplitInitEv" Comment="" x="400.0" y="2133.3333333333335">
+			</FB>
+			<FB Name="TIMER_CYCLE" Type="E_DELAY" Comment="" x="400.0" y="266.6666666666667">
+				<Parameter Name="DT" Value="T#20ms"/>
+			</FB>
+			<FB Name="LS1ToLS2" Type="TCFB" Comment="" x="2266.666666666667" y="266.6666666666667">
+				<Parameter Name="QI" Value="1"/>
+				<Parameter Name="GetTime" Value="0"/>
+				<Parameter Name="SetTimeOut" Value="20.3"/>
+				<Parameter Name="Specification" Value="Reaction::q-&gt;e(i|=[3.5,4.8]s)"/>
+			</FB>
+			<FB Name="LS2ToSf" Type="TCFB" Comment="" x="5200.0" y="266.6666666666667">
+				<Parameter Name="QI" Value="1"/>
+				<Parameter Name="GetTime" Value="0"/>
+				<Parameter Name="SetTimeOut" Value="20.3"/>
+				<Parameter Name="Specification" Value="Age::q-&gt;e(i|=[3.9,4.4]s)"/>
+			</FB>
+			<FB Name="SfToLS3" Type="TCFB" Comment="" x="7866.666666666667" y="266.6666666666667">
+				<Parameter Name="QI" Value="1"/>
+				<Parameter Name="GetTime" Value="0"/>
+				<Parameter Name="SetTimeOut" Value="20.3"/>
+				<Parameter Name="Specification" Value="Reaction::q-&gt;e(i|=[4.1,4.6]s)"/>
+			</FB>
+			<FB Name="LS3ToLS1" Type="TCFB" Comment="" x="10800.0" y="266.6666666666667">
+				<Parameter Name="QI" Value="1"/>
+				<Parameter Name="GetTime" Value="0"/>
+				<Parameter Name="SetTimeOut" Value="20.3"/>
+				<Parameter Name="Specification" Value="Reaction::q-&gt;e(i|=[6.2,6.5]s)"/>
+			</FB>
+			<FB Name="AppearanceOfWP" Type="SupplyConv" Comment="" x="1733.3333333333335" y="3333.3333333333335">
+			</FB>
+			<FB Name="PickAndPlaceRobot" Type="PlantFB" Comment="" x="7200.0" y="2266.666666666667">
+				<Parameter Name="InitPos" Value="0"/>
+				<Parameter Name="GearRatio" Value="0.1"/>
+				<Parameter Name="CxTime" Value="0.35"/>
+				<Parameter Name="CyTime" Value="0.18"/>
+				<Parameter Name="CgTime" Value="0.09"/>
+				<Parameter Name="U" Value="24"/>
+			</FB>
+			<FB Name="CycleForOccurrenceOfWP" Type="E_DELAY" Comment="" x="1733.3333333333335" y="4266.666666666667">
+				<Parameter Name="DT" Value="T#6000ms"/>
+			</FB>
+			<FB Name="LS1" Type="Sensor" Comment="" x="10800.0" y="2266.666666666667">
+				<Parameter Name="Direct" Value="1"/>
+				<Parameter Name="LimPos" Value="0"/>
+			</FB>
+			<FB Name="LS3" Type="Sensor" Comment="" x="10800.0" y="4266.666666666667">
+				<Parameter Name="Direct" Value="0"/>
+				<Parameter Name="LimPos" Value="180"/>
+			</FB>
+			<FB Name="Controller" Type="ControllerFB" Comment="" x="4133.333333333334" y="2266.666666666667">
+				<Parameter Name="Load" Value="0.2"/>
+				<Parameter Name="CtrlPos" Value="15"/>
+				<Parameter Name="StopPos1" Value="90"/>
+				<Parameter Name="StopPos2" Value="180"/>
+			</FB>
+			<FB Name="EnableCheck" Type="EnableCheck" Comment="" x="400.0" y="1066.6666666666667">
+				<Parameter Name="QIi" Value="1"/>
+			</FB>
+			<FB Name="OnOffLS1" Type="E_SWITCH" Comment="" x="9333.333333333334" y="2533.3333333333335">
+				<Parameter Name="G" Value="1"/>
+			</FB>
+			<FB Name="OnOffLS2" Type="E_SWITCH" Comment="" x="9333.333333333334" y="3466.666666666667">
+				<Parameter Name="G" Value="1"/>
+			</FB>
+			<FB Name="OnOffLS3" Type="E_SWITCH" Comment="" x="9333.333333333334" y="4400.0">
+				<Parameter Name="G" Value="1"/>
+			</FB>
+			<FB Name="OnOffFeedingSystem" Type="E_SWITCH" Comment="" x="3066.666666666667" y="4666.666666666667">
+				<Parameter Name="G" Value="1"/>
+			</FB>
+			<FB Name="OnOffPressMachine" Type="E_SWITCH" Comment="" x="2000.0" y="1866.6666666666667">
+				<Parameter Name="G" Value="1"/>
+			</FB>
+			<EventConnections>
+				<Connection Source="LS2ToSf.Satisfied" Destination="Controller.Sf" Comment="" dx1="300.0" dx2="486.6666666666667" dy="1333.3333333333335"/>
+				<Connection Source="TIMER_CYCLE.EO" Destination="TIMER_CYCLE.STOP" Comment="" dx1="80.0" dx2="80.0" dy="473.33333333333337"/>
+				<Connection Source="Controller.INITO" Destination="PickAndPlaceRobot.INIT" Comment=""/>
+				<Connection Source="LS2ToSf.INITO" Destination="SfToLS3.INIT" Comment=""/>
+				<Connection Source="SplitFirstOccurOfLS1.CNF" Destination="AppearanceOfWP.LS1Req" Comment="" dx1="166.66666666666669"/>
+				<Connection Source="EnableCheck.Satisfied" Destination="Controller.LS1" Comment="" dx1="760.0"/>
+				<Connection Source="ExecutionAtPressMachine.EO" Destination="ExecutionAtPressMachine.STOP" Comment="" dx1="80.0" dx2="200.0" dy="-260.0"/>
+				<Connection Source="LS2.Ready" Destination="LS3.Active" Comment="" dx1="80.0" dx2="80.0" dy="893.3333333333334"/>
+				<Connection Source="SfToLS3.INITO" Destination="LS3ToLS1.INIT" Comment=""/>
+				<Connection Source="EnableCheck.Violated" Destination="LS1ToLS2.ReqEvent" Comment="" dx1="620.0"/>
+				<Connection Source="LS2ToSf.Satisfied" Destination="SfToLS3.ReqEvent" Comment=""/>
+				<Connection Source="CycleForOccurrenceOfWP.EO" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="-200.0"/>
+				<Connection Source="LS3ToLS1.CNF" Destination="TIMER_CYCLE.START" Comment="" dx1="226.66666666666669" dx2="80.0" dy="-460.0"/>
+				<Connection Source="EnableCheck.Satisfied" Destination="LS1ToLS2.ReqEvent" Comment="" dx1="773.3333333333334"/>
+				<Connection Source="LS2ToSf.CNF" Destination="SfToLS3.REQ" Comment=""/>
+				<Connection Source="SfToLS3.Satisfied" Destination="Controller.LS3" Comment="" dx1="80.0" dx2="673.3333333333334" dy="1233.3333333333335"/>
+				<Connection Source="LS2ToSf.Violated" Destination="SfToLS3.ReqEvent" Comment="" dx1="500.0"/>
+				<Connection Source="PickAndPlaceRobot.INITO" Destination="TIMER_CYCLE.START" Comment="" dx1="80.0" dx2="273.33333333333337" dy="-526.6666666666667"/>
+				<Connection Source="LS1ToLS2.Violated" Destination="LS2ToSf.ReqEvent" Comment="" dx1="1213.3333333333335"/>
+				<Connection Source="SfToLS3.Violated" Destination="LS3ToLS1.ReqEvent" Comment="" dx1="793.3333333333334"/>
+				<Connection Source="TIMER_CYCLE.EO" Destination="LS1ToLS2.REQ" Comment="" dx1="493.33333333333337"/>
+				<Connection Source="LS3ToLS1.Violated" Destination="EnableCheck.REQ" Comment="" dx1="80.0" dx2="133.33333333333334" dy="-866.6666666666667"/>
+				<Connection Source="LS1ToLS2.Satisfied" Destination="LS2ToSf.ReqEvent" Comment=""/>
+				<Connection Source="LS3ToLS1.CNF" Destination="Controller.REQ" Comment="" dx1="80.0" dx2="140.0" dy="1133.3333333333335"/>
+				<Connection Source="LS1ToLS2.Satisfied" Destination="Controller.LS2" Comment="" dx1="126.66666666666667"/>
+				<Connection Source="LS3ToLS1.INITO" Destination="LS1.Active" Comment="" dx1="80.0" dx2="80.0" dy="1520.0"/>
+				<Connection Source="LS3.Response" Destination="SfToLS3.RspEvent" Comment="" dx1="80.0" dx2="446.6666666666667" dy="-2533.3333333333335"/>
+				<Connection Source="LS1.Ready" Destination="LS2.Active" Comment="" dx1="80.0" dx2="80.0" dy="866.6666666666667"/>
+				<Connection Source="LS3.Ready" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="586.6666666666667" dy="826.6666666666667"/>
+				<Connection Source="ExecutionAtPressMachine.EO" Destination="LS2ToSf.RspEvent" Comment="" dx1="1293.3333333333335"/>
+				<Connection Source="LS1ToLS2.INITO" Destination="LS2ToSf.INIT" Comment=""/>
+				<Connection Source="SfToLS3.CNF" Destination="LS3ToLS1.REQ" Comment=""/>
+				<Connection Source="SplitFirstOccurOfLS1.NextTimes" Destination="LS3ToLS1.RspEvent" Comment="" dx1="9226.666666666668"/>
+				<Connection Source="AppearanceOfWP.WpExist" Destination="Controller.Sp" Comment="" dx1="586.6666666666667"/>
+				<Connection Source="LS3ToLS1.Satisfied" Destination="EnableCheck.REQ" Comment="" dx1="313.33333333333337" dx2="73.33333333333334" dy="-686.6666666666667"/>
+				<Connection Source="SfToLS3.Satisfied" Destination="LS3ToLS1.ReqEvent" Comment=""/>
+				<Connection Source="SplitFirstOccurOfLS1.FirstTime" Destination="EnableCheck.REQ" Comment="" dx1="80.0" dx2="140.0" dy="-300.0"/>
+				<Connection Source="LS2.Response" Destination="LS1ToLS2.RspEvent" Comment="" dx1="240.0" dx2="480.0" dy="-1693.3333333333335"/>
+				<Connection Source="LS3ToLS1.INITO" Destination="Controller.INIT" Comment="" dx1="80.0" dx2="80.0" dy="1773.3333333333335"/>
+				<Connection Source="CycleForOccurrenceOfWP.EO" Destination="CycleForOccurrenceOfWP.STOP" Comment="" dx1="80.0" dx2="340.0" dy="-193.33333333333334"/>
+				<Connection Source="Controller.CNF" Destination="PickAndPlaceRobot.REQ" Comment=""/>
+				<Connection Source="LS1ToLS2.CNF" Destination="LS2ToSf.REQ" Comment=""/>
+				<Connection Source="LS1.Response" Destination="SplitFirstOccurOfLS1.REQ" Comment="" dx1="80.0" dx2="80.0" dy="-573.3333333333334"/>
+				<Connection Source="PickAndPlaceRobot.CNF" Destination="OnOffLS3.EI" Comment="" dx1="1000.0"/>
+				<Connection Source="OnOffLS3.EO1" Destination="LS3.Request" Comment="" dx1="466.6666666666667"/>
+				<Connection Source="PickAndPlaceRobot.CNF" Destination="OnOffLS2.EI" Comment="" dx1="860.0"/>
+				<Connection Source="OnOffLS2.EO1" Destination="LS2.Request" Comment="" dx1="466.6666666666667"/>
+				<Connection Source="PickAndPlaceRobot.CNF" Destination="OnOffLS1.EI" Comment="" dx1="1133.3333333333335"/>
+				<Connection Source="OnOffLS1.EO1" Destination="LS1.Request" Comment="" dx1="466.6666666666667"/>
+				<Connection Source="LS3.Response" Destination="OnOffFeedingSystem.EI" Comment="" dx1="80.0" dx2="466.6666666666667" dy="720.0"/>
+				<Connection Source="OnOffFeedingSystem.EO1" Destination="CycleForOccurrenceOfWP.START" Comment="" dx1="80.0" dx2="80.0" dy="-773.3333333333334"/>
+				<Connection Source="LS1ToLS2.Satisfied" Destination="OnOffPressMachine.EI" Comment="" dx1="80.0" dx2="80.0" dy="1100.0"/>
+				<Connection Source="OnOffPressMachine.EO1" Destination="ExecutionAtPressMachine.START" Comment="" dx1="80.0" dx2="80.0" dy="346.6666666666667"/>
+			</EventConnections>
+			<DataConnections>
+				<Connection Source="PickAndPlaceRobot.Position" Destination="LS3.Position" Comment="" dx1="386.6666666666667"/>
+				<Connection Source="LS1ToLS2.QO" Destination="LS2ToSf.QI" Comment=""/>
+				<Connection Source="PickAndPlaceRobot.Position" Destination="LS1.Position" Comment=""/>
+				<Connection Source="Controller.PWM" Destination="PickAndPlaceRobot.PWM" Comment="" dx1="706.6666666666667"/>
+				<Connection Source="EnableCheck.OUT" Destination="LS1ToLS2.QI" Comment="" dx1="1000.0"/>
+				<Connection Source="PickAndPlaceRobot.Position" Destination="LS2.Position" Comment="" dx1="613.3333333333334"/>
+				<Connection Source="LS2ToSf.QO" Destination="SfToLS3.QI" Comment=""/>
+				<Connection Source="PickAndPlaceRobot.Position" Destination="Controller.Position" Comment="" dx1="80.0" dx2="80.0" dy="1273.3333333333335"/>
+				<Connection Source="LS3ToLS1.QO" Destination="EnableCheck.QIt" Comment="" dx1="80.0" dx2="160.0" dy="800.0"/>
+				<Connection Source="SfToLS3.QO" Destination="LS3ToLS1.QI" Comment=""/>
+				<Connection Source="AppearanceOfWP.Workpiece" Destination="Controller.Workpiece" Comment="" dx1="706.6666666666667"/>
+			</DataConnections>
+			<AdapterConnections>
+				<Connection Source="Controller.RI" Destination="PickAndPlaceRobot.RI" Comment="" dx1="706.6666666666667"/>
+			</AdapterConnections>
+		</SubAppNetwork>
+	</Application>
+	<Device Name="FORTE_PC" Type="FORTE_PC" Comment="" x="5920.0" y="2400.0">
+		<Parameter Name="MGR_ID" Value="&quot;localhost:61499&quot;"/>
+		<Attribute Name="Profile" Type="STRING" Value="HOLOBLOC" Comment="device profile"/>
+		<Attribute Name="Color" Type="STRING" Value="128,255,128" Comment="color"/>
+		<Resource Name="CPU1" Type="EMB_RES" Comment="" x="0.0" y="0.0">
+			<FBNetwork>
+				<FB Name="LS2" Type="OpticSensor" Comment="" x="6133.333333333334" y="1600.0">
+					<Parameter Name="RateDetect" Value="0.012"/>
+					<Parameter Name="PutPosition" Value="90"/>
+				</FB>
+				<FB Name="PnP" Type="PlantFB" Comment="" x="4133.333333333334" y="533.3333333333334">
+					<Parameter Name="InitPos" Value="0"/>
+					<Parameter Name="GearRatio" Value="0.1"/>
+					<Parameter Name="CxTime" Value="0.35"/>
+					<Parameter Name="CyTime" Value="0.18"/>
+					<Parameter Name="CgTime" Value="0.09"/>
+					<Parameter Name="U" Value="24"/>
+				</FB>
+				<FB Name="LS1" Type="Sensor" Comment="" x="6133.333333333334" y="533.3333333333334">
+					<Parameter Name="Direct" Value="1"/>
+					<Parameter Name="LimPos" Value="0"/>
+				</FB>
+				<FB Name="LS3" Type="Sensor" Comment="" x="6133.333333333334" y="2800.0">
+					<Parameter Name="Direct" Value="0"/>
+					<Parameter Name="LimPos" Value="180"/>
+				</FB>
+				<FB Name="Controller" Type="ControllerFB" Comment="" x="2666.666666666667" y="533.3333333333334">
+					<Parameter Name="Load" Value="0.2"/>
+					<Parameter Name="CtrlPos" Value="15"/>
+					<Parameter Name="StopPos1" Value="90"/>
+					<Parameter Name="StopPos2" Value="180"/>
+				</FB>
+				<FB Name="AppearanceOfWP" Type="SupplyConv" Comment="" x="1066.6666666666667" y="2000.0">
+				</FB>
+				<FB Name="ExecutionAtPressMachine" Type="E_DELAY" Comment="" x="1333.3333333333335" y="1333.3333333333335">
+					<Parameter Name="DT" Value="T#4s"/>
+				</FB>
+				<FB Name="CycleForOccurrenceOfWP" Type="E_DELAY" Comment="" x="1333.3333333333335" y="2933.3333333333335">
+					<Parameter Name="DT" Value="T#6s"/>
+				</FB>
+				<FB Name="TIMER_CYCLE" Type="E_CYCLE" Comment="" x="533.3333333333334" y="533.3333333333334">
+					<Parameter Name="DT" Value="T#80ms"/>
+				</FB>
+				<EventConnections>
+					<Connection Source="PnP.CNF" Destination="LS2.Request" Comment="" dx1="540.0"/>
+					<Connection Source="PnP.INITO" Destination="LS1.Active" Comment=""/>
+					<Connection Source="PnP.CNF" Destination="LS1.Request" Comment=""/>
+					<Connection Source="LS1.Ready" Destination="LS2.Active" Comment="" dx1="80.0" dx2="80.0" dy="533.3333333333334"/>
+					<Connection Source="LS2.Ready" Destination="LS3.Active" Comment="" dx1="80.0" dx2="80.0" dy="600.0"/>
+					<Connection Source="PnP.CNF" Destination="LS3.Request" Comment="" dx1="540.0"/>
+					<Connection Source="LS1.Response" Destination="Controller.LS1" Comment="" dx1="80.0" dx2="80.0" dy="46.66666666666667"/>
+					<Connection Source="LS2.Response" Destination="Controller.LS2" Comment="" dx1="80.0" dx2="80.0" dy="-433.33333333333337"/>
+					<Connection Source="LS3.Response" Destination="Controller.LS3" Comment="" dx1="80.0" dx2="80.0" dy="-980.0"/>
+					<Connection Source="Controller.INITO" Destination="PnP.INIT" Comment=""/>
+					<Connection Source="Controller.CNF" Destination="PnP.REQ" Comment=""/>
+					<Connection Source="LS1.Response" Destination="AppearanceOfWP.LS1Req" Comment="" dx1="80.0" dx2="80.0" dy="733.3333333333334"/>
+					<Connection Source="AppearanceOfWP.WpExist" Destination="Controller.Sp" Comment="" dx1="386.6666666666667"/>
+					<Connection Source="ExecutionAtPressMachine.EO" Destination="ExecutionAtPressMachine.STOP" Comment="" dx1="80.0" dx2="80.0" dy="46.66666666666667"/>
+					<Connection Source="ExecutionAtPressMachine.EO" Destination="Controller.Sf" Comment="" dx1="426.6666666666667"/>
+					<Connection Source="LS3.Response" Destination="CycleForOccurrenceOfWP.START" Comment="" dx1="80.0" dx2="80.0" dy="13.333333333333334"/>
+					<Connection Source="CycleForOccurrenceOfWP.EO" Destination="CycleForOccurrenceOfWP.STOP" Comment="" dx1="80.0" dx2="80.0" dy="46.66666666666667"/>
+					<Connection Source="CycleForOccurrenceOfWP.EO" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="-466.6666666666667"/>
+					<Connection Source="LS3.Ready" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="-400.0"/>
+					<Connection Source="LS2.Response" Destination="ExecutionAtPressMachine.START" Comment="" dx1="80.0" dx2="80.0" dy="-180.0"/>
+					<Connection Source="START.COLD" Destination="Controller.INIT" Comment="" dx1="313.33333333333337"/>
+					<Connection Source="START.WARM" Destination="Controller.INIT" Comment="" dx1="313.33333333333337"/>
+					<Connection Source="TIMER_CYCLE.EO" Destination="Controller.REQ" Comment="" dx1="953.3333333333334"/>
+				</EventConnections>
+				<DataConnections>
+					<Connection Source="PnP.Position" Destination="LS2.Position" Comment="" dx1="540.0"/>
+					<Connection Source="PnP.Position" Destination="LS1.Position" Comment=""/>
+					<Connection Source="PnP.Position" Destination="LS3.Position" Comment="" dx1="540.0"/>
+					<Connection Source="PnP.Position" Destination="Controller.Position" Comment="" dx1="80.0" dx2="80.0" dy="400.0"/>
+					<Connection Source="Controller.PWM" Destination="PnP.PWM" Comment="" dx1="373.33333333333337"/>
+					<Connection Source="AppearanceOfWP.Workpiece" Destination="Controller.Workpiece" Comment="" dx1="386.6666666666667"/>
+				</DataConnections>
+				<AdapterConnections>
+					<Connection Source="Controller.RI" Destination="PnP.RI" Comment="" dx1="373.33333333333337"/>
+				</AdapterConnections>
+			</FBNetwork>
+		</Resource>
+		<Resource Name="CPU2" Type="EMB_RES" Comment="" x="0.0" y="0.0">
+			<FBNetwork>
+				<FB Name="LS2" Type="OpticSensor" Comment="" x="10800.0" y="3200.0">
+					<Parameter Name="RateDetect" Value="0.012"/>
+					<Parameter Name="PutPosition" Value="90"/>
+				</FB>
+				<FB Name="ExecutionAtPressMachine" Type="E_DELAY" Comment="" x="1733.3333333333335" y="2666.666666666667">
+					<Parameter Name="DT" Value="T#4000ms"/>
+				</FB>
+				<FB Name="SplitFirstOccurOfLS1" Type="SplitInitEv" Comment="" x="400.0" y="2133.3333333333335">
+				</FB>
+				<FB Name="TIMER_CYCLE" Type="E_DELAY" Comment="" x="400.0" y="266.6666666666667">
+					<Parameter Name="DT" Value="T#20ms"/>
+				</FB>
+				<FB Name="LS1ToLS2" Type="TCFB" Comment="" x="2266.666666666667" y="266.6666666666667">
+					<Parameter Name="QI" Value="1"/>
+					<Parameter Name="GetTime" Value="0"/>
+					<Parameter Name="SetTimeOut" Value="20.3"/>
+					<Parameter Name="Specification" Value="Reaction::q-&gt;e(i|=[3.5,4.8]s)"/>
+				</FB>
+				<FB Name="LS2ToSf" Type="TCFB" Comment="" x="5200.0" y="266.6666666666667">
+					<Parameter Name="QI" Value="1"/>
+					<Parameter Name="GetTime" Value="0"/>
+					<Parameter Name="SetTimeOut" Value="20.3"/>
+					<Parameter Name="Specification" Value="Age::q-&gt;e(i|=[3.9,4.4]s)"/>
+				</FB>
+				<FB Name="SfToLS3" Type="TCFB" Comment="" x="7866.666666666667" y="266.6666666666667">
+					<Parameter Name="QI" Value="1"/>
+					<Parameter Name="GetTime" Value="0"/>
+					<Parameter Name="SetTimeOut" Value="20.3"/>
+					<Parameter Name="Specification" Value="Reaction::q-&gt;e(i|=[4.1,4.6]s)"/>
+				</FB>
+				<FB Name="LS3ToLS1" Type="TCFB" Comment="" x="10666.666666666668" y="266.6666666666667">
+					<Parameter Name="QI" Value="1"/>
+					<Parameter Name="GetTime" Value="0"/>
+					<Parameter Name="SetTimeOut" Value="20.3"/>
+					<Parameter Name="Specification" Value="Reaction::q-&gt;e(i|=[6.2,6.5]s)"/>
+				</FB>
+				<FB Name="AppearanceOfWP" Type="SupplyConv" Comment="" x="1733.3333333333335" y="3333.3333333333335">
+				</FB>
+				<FB Name="PickAndPlaceRobot" Type="PlantFB" Comment="" x="7200.0" y="2266.666666666667">
+					<Parameter Name="InitPos" Value="0"/>
+					<Parameter Name="GearRatio" Value="0.1"/>
+					<Parameter Name="CxTime" Value="0.35"/>
+					<Parameter Name="CyTime" Value="0.18"/>
+					<Parameter Name="CgTime" Value="0.09"/>
+					<Parameter Name="U" Value="24"/>
+				</FB>
+				<FB Name="CycleForOccurrenceOfWP" Type="E_DELAY" Comment="" x="1733.3333333333335" y="4266.666666666667">
+					<Parameter Name="DT" Value="T#6000ms"/>
+				</FB>
+				<FB Name="LS1" Type="Sensor" Comment="" x="10800.0" y="2266.666666666667">
+					<Parameter Name="Direct" Value="1"/>
+					<Parameter Name="LimPos" Value="0"/>
+				</FB>
+				<FB Name="LS3" Type="Sensor" Comment="" x="10933.333333333334" y="4266.666666666667">
+					<Parameter Name="Direct" Value="0"/>
+					<Parameter Name="LimPos" Value="180"/>
+				</FB>
+				<FB Name="Controller" Type="ControllerFB" Comment="" x="4133.333333333334" y="2266.666666666667">
+					<Parameter Name="Load" Value="0.2"/>
+					<Parameter Name="CtrlPos" Value="15"/>
+					<Parameter Name="StopPos1" Value="90"/>
+					<Parameter Name="StopPos2" Value="180"/>
+				</FB>
+				<FB Name="EnableCheck" Type="EnableCheck" Comment="" x="400.0" y="1066.6666666666667">
+					<Parameter Name="QIi" Value="1"/>
+				</FB>
+				<FB Name="OnOffPressMachine" Type="E_SWITCH" Comment="" x="2000.0" y="1866.6666666666667">
+					<Parameter Name="G" Value="1"/>
+				</FB>
+				<FB Name="OnOffFeedingSystem" Type="E_SWITCH" Comment="" x="3066.666666666667" y="4666.666666666667">
+					<Parameter Name="G" Value="1"/>
+				</FB>
+				<FB Name="OnOffLS2" Type="E_SWITCH" Comment="" x="9333.333333333334" y="3466.666666666667">
+					<Parameter Name="G" Value="1"/>
+				</FB>
+				<FB Name="OnOffLS1" Type="E_SWITCH" Comment="" x="9333.333333333334" y="2533.3333333333335">
+					<Parameter Name="G" Value="1"/>
+				</FB>
+				<FB Name="OnOffLS3" Type="E_SWITCH" Comment="" x="9333.333333333334" y="4400.0">
+					<Parameter Name="G" Value="1"/>
+				</FB>
+				<EventConnections>
+					<Connection Source="ExecutionAtPressMachine.EO" Destination="ExecutionAtPressMachine.STOP" Comment="" dx1="80.0" dx2="80.0" dy="46.66666666666667"/>
+					<Connection Source="TIMER_CYCLE.EO" Destination="TIMER_CYCLE.STOP" Comment="" dx1="80.0" dx2="80.0" dy="46.66666666666667"/>
+					<Connection Source="TIMER_CYCLE.EO" Destination="LS1ToLS2.REQ" Comment="" dx1="686.6666666666667"/>
+					<Connection Source="LS2.Response" Destination="LS1ToLS2.RspEvent" Comment="" dx1="80.0" dx2="80.0" dy="-1366.6666666666667"/>
+					<Connection Source="LS1ToLS2.INITO" Destination="LS2ToSf.INIT" Comment=""/>
+					<Connection Source="LS1ToLS2.CNF" Destination="LS2ToSf.REQ" Comment=""/>
+					<Connection Source="LS1ToLS2.Violated" Destination="LS2ToSf.ReqEvent" Comment="" dx1="913.3333333333334"/>
+					<Connection Source="LS1ToLS2.Satisfied" Destination="LS2ToSf.ReqEvent" Comment=""/>
+					<Connection Source="ExecutionAtPressMachine.EO" Destination="LS2ToSf.RspEvent" Comment="" dx1="1346.6666666666667"/>
+					<Connection Source="LS2ToSf.INITO" Destination="SfToLS3.INIT" Comment=""/>
+					<Connection Source="LS2ToSf.CNF" Destination="SfToLS3.REQ" Comment=""/>
+					<Connection Source="LS2ToSf.Satisfied" Destination="SfToLS3.ReqEvent" Comment=""/>
+					<Connection Source="LS2ToSf.Violated" Destination="SfToLS3.ReqEvent" Comment="" dx1="780.0"/>
+					<Connection Source="SfToLS3.INITO" Destination="LS3ToLS1.INIT" Comment=""/>
+					<Connection Source="SfToLS3.CNF" Destination="LS3ToLS1.REQ" Comment=""/>
+					<Connection Source="SfToLS3.Violated" Destination="LS3ToLS1.ReqEvent" Comment="" dx1="846.6666666666667"/>
+					<Connection Source="SfToLS3.Satisfied" Destination="LS3ToLS1.ReqEvent" Comment=""/>
+					<Connection Source="SplitFirstOccurOfLS1.NextTimes" Destination="LS3ToLS1.RspEvent" Comment="" dx1="4726.666666666667"/>
+					<Connection Source="LS3ToLS1.CNF" Destination="TIMER_CYCLE.START" Comment="" dx1="80.0" dx2="80.0" dy="-46.66666666666667"/>
+					<Connection Source="SplitFirstOccurOfLS1.CNF" Destination="AppearanceOfWP.LS1Req" Comment="" dx1="260.0"/>
+					<Connection Source="PickAndPlaceRobot.INITO" Destination="TIMER_CYCLE.START" Comment="" dx1="80.0" dx2="80.0" dy="-1000.0"/>
+					<Connection Source="CycleForOccurrenceOfWP.EO" Destination="CycleForOccurrenceOfWP.STOP" Comment="" dx1="80.0" dx2="80.0" dy="46.66666666666667"/>
+					<Connection Source="CycleForOccurrenceOfWP.EO" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="-466.6666666666667"/>
+					<Connection Source="LS3ToLS1.INITO" Destination="LS1.Active" Comment="" dx1="80.0" dx2="80.0" dy="1000.0"/>
+					<Connection Source="LS1.Ready" Destination="LS2.Active" Comment="" dx1="80.0" dx2="80.0" dy="466.6666666666667"/>
+					<Connection Source="LS2.Ready" Destination="LS3.Active" Comment="" dx1="80.0" dx2="80.0" dy="533.3333333333334"/>
+					<Connection Source="LS3.Ready" Destination="AppearanceOfWP.WpArrive" Comment="" dx1="80.0" dx2="80.0" dy="-466.6666666666667"/>
+					<Connection Source="LS3.Response" Destination="SfToLS3.RspEvent" Comment="" dx1="80.0" dx2="80.0" dy="-1900.0"/>
+					<Connection Source="LS3ToLS1.INITO" Destination="Controller.INIT" Comment="" dx1="80.0" dx2="80.0" dy="1000.0"/>
+					<Connection Source="LS3ToLS1.CNF" Destination="Controller.REQ" Comment="" dx1="80.0" dx2="80.0" dy="1000.0"/>
+					<Connection Source="LS1ToLS2.Satisfied" Destination="Controller.LS2" Comment="" dx1="380.0"/>
+					<Connection Source="SfToLS3.Satisfied" Destination="Controller.LS3" Comment="" dx1="80.0" dx2="80.0" dy="1100.0"/>
+					<Connection Source="AppearanceOfWP.WpExist" Destination="Controller.Sp" Comment="" dx1="786.6666666666667"/>
+					<Connection Source="LS2ToSf.Satisfied" Destination="Controller.Sf" Comment="" dx1="80.0" dx2="80.0" dy="1200.0"/>
+					<Connection Source="Controller.INITO" Destination="PickAndPlaceRobot.INIT" Comment=""/>
+					<Connection Source="Controller.CNF" Destination="PickAndPlaceRobot.REQ" Comment=""/>
+					<Connection Source="LS3ToLS1.Violated" Destination="EnableCheck.REQ" Comment="" dx1="80.0" dx2="80.0" dy="200.0"/>
+					<Connection Source="LS3ToLS1.Satisfied" Destination="EnableCheck.REQ" Comment="" dx1="80.0" dx2="80.0" dy="300.0"/>
+					<Connection Source="SplitFirstOccurOfLS1.FirstTime" Destination="EnableCheck.REQ" Comment="" dx1="80.0" dx2="80.0" dy="-580.0"/>
+					<Connection Source="EnableCheck.Satisfied" Destination="Controller.LS1" Comment="" dx1="1500.0"/>
+					<Connection Source="EnableCheck.Satisfied" Destination="LS1ToLS2.ReqEvent" Comment="" dx1="566.6666666666667"/>
+					<Connection Source="EnableCheck.Violated" Destination="LS1ToLS2.ReqEvent" Comment="" dx1="566.6666666666667"/>
+					<Connection Source="START.COLD" Destination="LS1ToLS2.INIT" Comment="" dx1="313.33333333333337"/>
+					<Connection Source="START.WARM" Destination="LS1ToLS2.INIT" Comment="" dx1="313.33333333333337"/>
+					<Connection Source="LS1.Response" Destination="SplitFirstOccurOfLS1.REQ" Comment="" dx1="80.0" dx2="80.0" dy="-113.33333333333334"/>
+					<Connection Source="LS1ToLS2.Satisfied" Destination="OnOffPressMachine.EI" Comment=""/>
+					<Connection Source="OnOffPressMachine.EO1" Destination="ExecutionAtPressMachine.START" Comment=""/>
+					<Connection Source="LS3.Response" Destination="OnOffFeedingSystem.EI" Comment=""/>
+					<Connection Source="OnOffFeedingSystem.EO1" Destination="CycleForOccurrenceOfWP.START" Comment=""/>
+					<Connection Source="PickAndPlaceRobot.CNF" Destination="OnOffLS2.EI" Comment=""/>
+					<Connection Source="OnOffLS2.EO1" Destination="LS2.Request" Comment=""/>
+					<Connection Source="PickAndPlaceRobot.CNF" Destination="OnOffLS1.EI" Comment=""/>
+					<Connection Source="OnOffLS1.EO1" Destination="LS1.Request" Comment=""/>
+					<Connection Source="PickAndPlaceRobot.CNF" Destination="OnOffLS3.EI" Comment=""/>
+					<Connection Source="OnOffLS3.EO1" Destination="LS3.Request" Comment=""/>
+				</EventConnections>
+				<DataConnections>
+					<Connection Source="LS1ToLS2.QO" Destination="LS2ToSf.QI" Comment=""/>
+					<Connection Source="LS2ToSf.QO" Destination="SfToLS3.QI" Comment=""/>
+					<Connection Source="SfToLS3.QO" Destination="LS3ToLS1.QI" Comment=""/>
+					<Connection Source="PickAndPlaceRobot.Position" Destination="LS2.Position" Comment="" dx1="1340.0"/>
+					<Connection Source="PickAndPlaceRobot.Position" Destination="LS1.Position" Comment=""/>
+					<Connection Source="PickAndPlaceRobot.Position" Destination="LS3.Position" Comment="" dx1="1406.6666666666667"/>
+					<Connection Source="AppearanceOfWP.Workpiece" Destination="Controller.Workpiece" Comment="" dx1="786.6666666666667"/>
+					<Connection Source="PickAndPlaceRobot.Position" Destination="Controller.Position" Comment="" dx1="80.0" dx2="80.0" dy="400.0"/>
+					<Connection Source="Controller.PWM" Destination="PickAndPlaceRobot.PWM" Comment="" dx1="1173.3333333333335"/>
+					<Connection Source="LS3ToLS1.QO" Destination="EnableCheck.QIt" Comment="" dx1="80.0" dx2="80.0" dy="300.0"/>
+					<Connection Source="EnableCheck.OUT" Destination="LS1ToLS2.QI" Comment="" dx1="566.6666666666667"/>
+				</DataConnections>
+				<AdapterConnections>
+					<Connection Source="Controller.RI" Destination="PickAndPlaceRobot.RI" Comment="" dx1="1173.3333333333335"/>
+				</AdapterConnections>
+			</FBNetwork>
+		</Resource>
+	</Device>
+	<Mapping From="SystemWithoutContract.LS2" To="FORTE_PC.CPU1.LS2"/>
+	<Mapping From="SystemWithoutContract.PnP" To="FORTE_PC.CPU1.PnP"/>
+	<Mapping From="SystemWithoutContract.LS1" To="FORTE_PC.CPU1.LS1"/>
+	<Mapping From="SystemWithoutContract.LS3" To="FORTE_PC.CPU1.LS3"/>
+	<Mapping From="SystemWithoutContract.Controller" To="FORTE_PC.CPU1.Controller"/>
+	<Mapping From="SystemWithoutContract.AppearanceOfWP" To="FORTE_PC.CPU1.AppearanceOfWP"/>
+	<Mapping From="SystemWithoutContract.ExecutionAtPressMachine" To="FORTE_PC.CPU1.ExecutionAtPressMachine"/>
+	<Mapping From="SystemWithoutContract.CycleForOccurrenceOfWP" To="FORTE_PC.CPU1.CycleForOccurrenceOfWP"/>
+	<Mapping From="SystemWithoutContract.TIMER_CYCLE" To="FORTE_PC.CPU1.TIMER_CYCLE"/>
+	<Mapping From="SystemApplyTimingContracts.LS2" To="FORTE_PC.CPU2.LS2"/>
+	<Mapping From="SystemApplyTimingContracts.ExecutionAtPressMachine" To="FORTE_PC.CPU2.ExecutionAtPressMachine"/>
+	<Mapping From="SystemApplyTimingContracts.SplitFirstOccurOfLS1" To="FORTE_PC.CPU2.SplitFirstOccurOfLS1"/>
+	<Mapping From="SystemApplyTimingContracts.TIMER_CYCLE" To="FORTE_PC.CPU2.TIMER_CYCLE"/>
+	<Mapping From="SystemApplyTimingContracts.LS1ToLS2" To="FORTE_PC.CPU2.LS1ToLS2"/>
+	<Mapping From="SystemApplyTimingContracts.LS2ToSf" To="FORTE_PC.CPU2.LS2ToSf"/>
+	<Mapping From="SystemApplyTimingContracts.SfToLS3" To="FORTE_PC.CPU2.SfToLS3"/>
+	<Mapping From="SystemApplyTimingContracts.LS3ToLS1" To="FORTE_PC.CPU2.LS3ToLS1"/>
+	<Mapping From="SystemApplyTimingContracts.AppearanceOfWP" To="FORTE_PC.CPU2.AppearanceOfWP"/>
+	<Mapping From="SystemApplyTimingContracts.PickAndPlaceRobot" To="FORTE_PC.CPU2.PickAndPlaceRobot"/>
+	<Mapping From="SystemApplyTimingContracts.CycleForOccurrenceOfWP" To="FORTE_PC.CPU2.CycleForOccurrenceOfWP"/>
+	<Mapping From="SystemApplyTimingContracts.LS1" To="FORTE_PC.CPU2.LS1"/>
+	<Mapping From="SystemApplyTimingContracts.LS3" To="FORTE_PC.CPU2.LS3"/>
+	<Mapping From="SystemApplyTimingContracts.Controller" To="FORTE_PC.CPU2.Controller"/>
+	<Mapping From="SystemApplyTimingContracts.EnableCheck" To="FORTE_PC.CPU2.EnableCheck"/>
+	<Mapping From="SystemApplyTimingContracts.OnOffPressMachine" To="FORTE_PC.CPU2.OnOffPressMachine"/>
+	<Mapping From="SystemApplyTimingContracts.OnOffFeedingSystem" To="FORTE_PC.CPU2.OnOffFeedingSystem"/>
+	<Mapping From="SystemApplyTimingContracts.OnOffLS2" To="FORTE_PC.CPU2.OnOffLS2"/>
+	<Mapping From="SystemApplyTimingContracts.OnOffLS1" To="FORTE_PC.CPU2.OnOffLS1"/>
+	<Mapping From="SystemApplyTimingContracts.OnOffLS3" To="FORTE_PC.CPU2.OnOffLS3"/>
+	<Segment Name="Ethernet" Type="Ethernet" Comment="" x="2266.666666666667" y="1333.3333333333335" dx1="5073.333333333334">
+		<Attribute Name="Color" Type="STRING" Value="194,232,127" Comment="color"/>
+	</Segment>
+	<Link SegmentName="Ethernet" CommResource="FORTE_PC" Comment="">
+	</Link>
+</System>

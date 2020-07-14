@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Template for an empty basic function block" Name="OpticSensor">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2019-03-19" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="Active" Type="Event">
+        <With Var="RateDetect"/>
+        <With Var="PutPosition"/>
+      </Event>
+      <Event Comment="" Name="Request" Type="Event">
+        <With Var="RateDetect"/>
+        <With Var="PutPosition"/>
+        <With Var="Position"/>
+      </Event>
+      <Event Comment="" Name="Reset" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="Ready" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+      <Event Comment="" Name="Response" Type="Event">
+        <With Var="OUT"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" InitialValue="0.001" Name="RateDetect" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="180" Name="PutPosition" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Position" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" InitialValue="FALSE" Name="OUT" Type="BOOL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="trigger" Type="BOOL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="change" Type="BOOL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="300.0" y="200.0"/>
+      <ECState Comment="" Name="ActiveSensor" x="3300.0" y="1300.0">
+        <ECAction Algorithm="Confirm" Output="Response"/>
+      </ECState>
+      <ECState Comment="" Name="ExectionState" x="3200.0" y="200.0">
+        <ECAction Algorithm="Execution"/>
+      </ECState>
+      <ECState Comment="" Name="InitState" x="1333.3333333333335" y="133.33333333333334">
+        <ECAction Algorithm="InitParams" Output="Ready"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForRequest" x="1600.0" y="1300.0"/>
+      <ECTransition Comment="" Condition="[trigger=FALSE]" Destination="WaitForRequest" Source="ExectionState" x="2633.3333333333335" y="906.6666666666667"/>
+      <ECTransition Comment="" Condition="[trigger=TRUE]" Destination="ActiveSensor" Source="ExectionState" x="3486.666666666667" y="866.6666666666667"/>
+      <ECTransition Comment="" Condition="Active" Destination="InitState" Source="START" x="920.0" y="213.33333333333334"/>
+      <ECTransition Comment="" Condition="Request" Destination="ExectionState" Source="WaitForRequest" x="2253.3333333333335" y="540.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="ActiveSensor" x="2560.0" y="1366.6666666666667"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="WaitForRequest" x="1106.6666666666667" y="840.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="InitState" x="1786.6666666666667" y="613.3333333333334"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="Confirm">
+      <ST Text="OUT := TRUE;&#13;&#10;trigger := FALSE;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="Execution">
+      <ST Text="IF ((Position &gt;= PutPosition*(1-RateDetect)) AND (Position &lt;= PutPosition*(1+RateDetect))) THEN&#13;&#10;&#9;IF (change = FALSE) THEN&#13;&#10;&#9;&#9;change := TRUE;&#13;&#10;&#9;&#9;trigger := TRUE;&#13;&#10;&#9;END_IF;&#13;&#10;ELSE&#13;&#10;&#9;IF (change = TRUE) THEN&#13;&#10;&#9;&#9;change := FALSE;&#13;&#10;&#9;&#9;OUT := FALSE;&#13;&#10;&#9;END_IF;&#13;&#10;&#9;trigger := FALSE;&#13;&#10;END_IF;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="InitParams">
+      <ST Text="OUT := FALSE;&#13;&#10;trigger := FALSE;&#13;&#10;change := FALSE;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>

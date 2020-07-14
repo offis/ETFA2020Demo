@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd">
+<FBType Comment="Template for an empty basic function block" Name="ControllerFB">
+  <Identification Standard="61499-2"/>
+  <VersionInfo Author="Duc Do Tran" Date="2019-03-19" Organization="OFFIS e.V." Version="1.0"/>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="INIT" Type="Event"/>
+      <Event Comment="" Name="REQ" Type="Event">
+        <With Var="StopPos1"/>
+        <With Var="Position"/>
+        <With Var="CtrlPos"/>
+        <With Var="StopPos2"/>
+        <With Var="Load"/>
+        <With Var="Workpiece"/>
+      </Event>
+      <Event Comment="" Name="LS1" Type="Event"/>
+      <Event Comment="" Name="LS2" Type="Event"/>
+      <Event Comment="" Name="LS3" Type="Event"/>
+      <Event Comment="" Name="Sp" Type="Event">
+        <With Var="Workpiece"/>
+      </Event>
+      <Event Comment="" Name="Sf" Type="Event"/>
+      <Event Comment="" Name="Reset" Type="Event"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="INITO" Type="Event"/>
+      <Event Comment="" Name="CNF" Type="Event">
+        <With Var="Te"/>
+        <With Var="Tc"/>
+        <With Var="PWM"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" Name="Workpiece" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="Load" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="15" Name="CtrlPos" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="90" Name="StopPos1" Type="REAL"/>
+      <VarDeclaration Comment="" InitialValue="180" Name="StopPos2" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Position" Type="REAL"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Comment="" Name="Te" Type="REAL"/>
+      <VarDeclaration Comment="" Name="Tc" Type="REAL"/>
+      <VarDeclaration Comment="" Name="PWM" Type="REAL"/>
+    </OutputVars>
+    <Plugs>
+      <AdapterDeclaration Comment="" Name="RI" Type="RobotInterface"/>
+    </Plugs>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="t0" Type="TIME"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="bd" Type="BOOL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="flag" Type="BOOL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="t" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="TRUE" Name="unique" Type="BOOL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="i" Type="USINT"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="Pos0" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="LimPos" Type="REAL"/>
+      <VarDeclaration Comment="Internal Variable" InitialValue="" Name="DirRot" Type="BOOL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="Initial State" Name="START" x="266.6666666666667" y="-800.0"/>
+      <ECState Comment="" Name="StartTimer" x="1200.0" y="-800.0">
+        <ECAction Algorithm="StopAlg" Output="RI.StopMotor"/>
+      </ECState>
+      <ECState Comment="" Name="GripActing" x="5866.666666666667" y="-666.6666666666667">
+        <ECAction Algorithm="GripAct" Output="RI.ReqCg"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForPressDone" x="4533.333333333334" y="2133.3333333333335"/>
+      <ECState Comment="" Name="LS1Active" x="2000.0" y="-400.0">
+        <ECAction Algorithm="StopAlg" Output="RI.StopMotor"/>
+      </ECState>
+      <ECState Comment="" Name="InitState" x="266.6666666666667" y="266.6666666666667">
+        <ECAction Output="RI.StartMotor"/>
+      </ECState>
+      <ECState Comment="" Name="WaitForRequest" x="2266.666666666667" y="800.0"/>
+      <ECState Comment="" Name="PositionCtrl" x="266.6666666666667" y="800.0">
+        <ECAction Algorithm="Rotaty" Output="CNF"/>
+      </ECState>
+      <ECState Comment="" Name="LS2Active" x="2800.0" y="2000.0">
+        <ECAction Algorithm="StopAlg" Output="RI.StopMotor"/>
+      </ECState>
+      <ECState Comment="" Name="CyActing" x="3400.0" y="-800.0">
+        <ECAction Algorithm="ChangeDirY" Output="RI.ReqCy"/>
+      </ECState>
+      <ECState Comment="" Name="CxActing" x="5866.666666666667" y="800.0">
+        <ECAction Algorithm="ChangeDirX" Output="RI.ReqCx"/>
+      </ECState>
+      <ECState Comment="" Name="PositionPy1" x="4000.0" y="933.3333333333334"/>
+      <ECState Comment="" Name="CheckWorkpiece" x="3466.666666666667" y="533.3333333333334"/>
+      <ECState Comment="" Name="StartMotor" x="266.6666666666667" y="2000.0">
+        <ECAction Algorithm="ChangeRot" Output="RI.StartMotor"/>
+      </ECState>
+      <ECState Comment="" Name="State" x="133.33333333333334" y="-266.6666666666667">
+        <ECAction Algorithm="Init" Output="INITO"/>
+      </ECState>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="InitState" x="1173.3333333333335" y="433.33333333333337"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="PositionCtrl" x="1486.6666666666667" y="1073.3333333333335"/>
+      <ECTransition Comment="" Condition="LS1[i = 0]" Destination="LS1Active" Source="WaitForRequest" x="2540.0" y="213.33333333333334"/>
+      <ECTransition Comment="" Condition="LS2[i = 1]" Destination="LS2Active" Source="WaitForRequest" x="2900.0" y="1586.6666666666667"/>
+      <ECTransition Comment="" Condition="RI.Y2" Destination="GripActing" Source="CyActing" x="4946.666666666667" y="-866.6666666666667"/>
+      <ECTransition Comment="" Condition="RI.Gc" Destination="CyActing" Source="GripActing" x="5300.0" y="-493.33333333333337"/>
+      <ECTransition Comment="" Condition="[RI.DirLinX = FALSE]" Destination="CxActing" Source="LS2Active" x="4100.0" y="1646.6666666666667"/>
+      <ECTransition Comment="" Condition="RI.X2" Destination="CyActing" Source="CxActing" x="4913.333333333334" y="-46.66666666666667"/>
+      <ECTransition Comment="" Condition="RI.Go" Destination="CyActing" Source="GripActing" x="5320.0" y="-206.66666666666669"/>
+      <ECTransition Comment="" Condition="RI.X1" Destination="WaitForPressDone" Source="CxActing" x="5280.0" y="1500.0"/>
+      <ECTransition Comment="" Condition="LS3[i = 2]" Destination="StartTimer" Source="WaitForRequest" x="1673.3333333333335" y="-260.0"/>
+      <ECTransition Comment="" Condition="REQ" Destination="PositionCtrl" Source="WaitForRequest" x="1233.3333333333335" y="580.0"/>
+      <ECTransition Comment="" Condition="1" Destination="CyActing" Source="StartTimer" x="2780.0" y="-933.3333333333334"/>
+      <ECTransition Comment="" Condition="RI.Y1" Destination="PositionPy1" Source="CyActing" x="4440.0" y="40.0"/>
+      <ECTransition Comment="" Condition="[i = 2]" Destination="CxActing" Source="PositionPy1" x="5066.666666666667" y="966.6666666666667"/>
+      <ECTransition Comment="" Condition="Sf[RI.DirGrip=FALSE]" Destination="CxActing" Source="WaitForPressDone" x="5880.0" y="1640.0"/>
+      <ECTransition Comment="" Condition="[Workpiece = TRUE]" Destination="CyActing" Source="CheckWorkpiece" x="3733.3333333333335" y="66.66666666666667"/>
+      <ECTransition Comment="" Condition="Sp" Destination="CheckWorkpiece" Source="CheckWorkpiece" x="3800.0" y="880.0"/>
+      <ECTransition Comment="" Condition="1" Destination="CheckWorkpiece" Source="LS1Active" x="3093.3333333333335" y="-26.666666666666668"/>
+      <ECTransition Comment="" Condition="[RI.DirGrip=TRUE]" Destination="StartMotor" Source="WaitForPressDone" x="2333.3333333333335" y="2533.3333333333335"/>
+      <ECTransition Comment="" Condition="[i &lt; 2]" Destination="StartMotor" Source="PositionPy1" x="2133.3333333333335" y="1520.0"/>
+      <ECTransition Comment="" Condition="1" Destination="WaitForRequest" Source="StartMotor" x="1540.0" y="1353.3333333333335"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="WaitForRequest" x="1193.3333333333335" y="-206.66666666666669"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="CyActing" x="1986.6666666666667" y="-506.6666666666667"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="CxActing" x="3806.666666666667" y="-133.33333333333334"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="GripActing" x="3493.3333333333335" y="-1186.6666666666667"/>
+      <ECTransition Comment="" Condition="REQ" Destination="InitState" Source="State" x="340.0" y="20.0"/>
+      <ECTransition Comment="" Condition="INIT" Destination="State" Source="START" x="173.33333333333334" y="-440.0"/>
+      <ECTransition Comment="" Condition="Reset" Destination="START" Source="CheckWorkpiece" x="2126.666666666667" y="-20.0"/>
+    </ECC>
+    <Algorithm Comment="new algorithm" Name="GripAct">
+      <ST Text="//Load := LoadIn;&#13;&#10;RI.DirGrip := NOT (RI.DirGrip);&#13;&#10;IF (RI.DirGrip = TRUE) THEN&#13;&#10;&#9;RI.LoadIn := Load;&#13;&#10;ELSE&#13;&#10;&#9;RI.LoadIn := 0;&#13;&#10;END_IF;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="Rotaty">
+      <ST Text="IF (unique = TRUE) THEN&#13;&#10;&#9;unique := FALSE;&#13;&#10;&#9;IF (Position &gt;= StopPos2 ) THEN&#13;&#10;&#9;&#9;&#9;DirRot := FALSE;&#13;&#10;&#9;END_IF;&#13;&#10;END_IF;&#13;&#10;IF(bd = TRUE) THEN&#13;&#10;&#9;t0 := NOW_MONOTONIC();&#13;&#10;&#9;flag := FALSE;&#13;&#10;&#9;bd := FALSE;&#13;&#10;END_IF;&#13;&#10;IF (DirRot = FALSE) THEN&#13;&#10;&#9;IF (Position &lt;= LimPos - CtrlPos) THEN&#13;&#10;&#9;&#9;PWM := 1;&#13;&#10;&#9;ELSE&#13;&#10;&#9;&#9;PWM := 0.5;&#13;&#10;&#9;&#9;IF (flag = FALSE) THEN&#13;&#10;&#9;&#9;&#9;flag := TRUE;&#13;&#10;&#9;&#9;&#9;t := TIME_IN_S_TO_LREAL(NOW_MONOTONIC()- t0);&#13;&#10;&#9;&#9;END_IF;&#13;&#10;&#9;END_IF;&#13;&#10;ELSE&#13;&#10;&#9;IF ( Position &gt;= LimPos + CtrlPos) THEN&#13;&#10;&#9;&#9;PWM := -1;&#13;&#10;&#9;ELSE&#13;&#10;&#9;&#9;PWM := -0.5;&#13;&#10;&#9;&#9;IF (flag = FALSE) THEN&#13;&#10;&#9;&#9;&#9;flag := TRUE;&#13;&#10;&#9;&#9;&#9;t := TIME_IN_S_TO_LREAL(NOW_MONOTONIC()- t0);&#13;&#10;&#9;&#9;END_IF;&#13;&#10;&#9;END_IF;&#13;&#10;END_IF;&#13;&#10;Tc := t;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="Init">
+      <ST Text="bd := TRUE;&#13;&#10;DirRot := TRUE;&#13;&#10;RI.DirLinX := FALSE;&#13;&#10;RI.DirLinY := FALSE;&#13;&#10;RI.DirGrip := FALSE;&#13;&#10;LimPos := 0;&#13;&#10;i := 0;"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="StopAlg">
+      <ST Text="PWM := 0;&#13;&#10;i :=( i + 1) MOD 3;&#13;&#10;Te := TIME_IN_S_TO_LREAL(NOW_MONOTONIC()- t0);"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="ChangeDirX">
+      <ST Text="RI.DirLinX := NOT(RI.DirLinX);"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="ChangeDirY">
+      <ST Text="RI.DirLinY := NOT(RI.DirLinY);"/>
+    </Algorithm>
+    <Algorithm Comment="new algorithm" Name="ChangeRot">
+      <ST Text="IF (i = 0) THEN&#13;&#10;&#9;DirRot := TRUE;&#13;&#10;&#9;LimPos := 0;&#13;&#10;ELSE&#13;&#10;&#9;DirRot := FALSE;&#13;&#10;&#9;IF (i = 1) THEN&#13;&#10;&#9;&#9;LimPos := StopPos1;&#13;&#10;&#9;ELSE&#13;&#10;&#9;&#9;LimPos := StopPos2;&#13;&#10;&#9;END_IF;&#13;&#10;END_IF;&#13;&#10;bd := TRUE;&#13;&#10;flag := FALSE;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>
